@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal Carreiras — Encontre o seu próximo passo</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="container navbar__inner">
+      <a href="index.html" class="navbar__logo"><img src="logo-icon.svg" alt="Portal Carreiras" /><div class="navbar__logo-text"><span>Portal</span><span>Carreiras</span></div></a>
+      <nav class="navbar__links">
+        <a href="#vagas">Vagas</a>
+        <a href="#empresas">Empresas</a>
+        <button class="btn btn--ghost" onclick="openModal('colaborador','login')">Entrar</button>
+        <button class="btn btn--primary" onclick="openModal('colaborador','register')">Criar Conta</button>
+      </nav>
+      <button class="navbar__burger" onclick="toggleMenu()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero__inner">
+      <h1 class="hero__title">O seu próximo trabalho<br><span>começa aqui.</span></h1>
+      <p class="hero__subtitle">Milhares de vagas. Empresas que procuram talento. Tudo num só lugar.</p>
+      <form class="search-bar" onsubmit="handleSearch(event)">
+        <div class="search-bar__field">
+          <svg class="search-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Cargo, empresa ou palavra-chave" id="searchQuery" />
+        </div>
+        <div class="search-bar__divider"></div>
+        <div class="search-bar__field">
+          <svg class="search-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <input type="text" placeholder="Cidade ou região" id="searchLocation" />
+        </div>
+        <button type="submit" class="btn btn--primary search-bar__btn">Pesquisar</button>
+      </form>
+      <div class="hero__tags">
+        <span>Popular:</span>
+        <a href="#" onclick="quickSearch('Engenharia de Software')">Engenharia de Software</a>
+        <a href="#" onclick="quickSearch('Marketing Digital')">Marketing Digital</a>
+        <a href="#" onclick="quickSearch('Recursos Humanos')">Recursos Humanos</a>
+        <a href="#" onclick="quickSearch('Dados')">Dados</a>
+        <a href="#" onclick="quickSearch('Design')">Design</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPLIT CTA -->
+  <section class="split-cta">
+    <div class="container">
+      <div class="split-cta__grid">
+        <div class="split-cta__card split-cta__card--blue">
+          <div class="split-cta__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <h2>Sou Colaborador</h2>
+          <p>Crie o seu perfil, candidate-se a vagas e acompanhe o estado das suas candidaturas em tempo real.</p>
+          <ul class="split-cta__list">
+            <li>Perfil profissional gratuito</li>
+            <li>Candidaturas em 1 clique</li>
+            <li>Acompanhamento do estado</li>
+            <li>Visibilidade para recrutadores</li>
+          </ul>
+          <div class="split-cta__actions">
+            <button class="btn btn--white" onclick="openModal('colaborador','register')">Criar Conta Grátis</button>
+            <button class="btn btn--ghost-white" onclick="openModal('colaborador','login')">Já tenho conta</button>
+          </div>
+        </div>
+        <div class="split-cta__card split-cta__card--dark">
+          <div class="split-cta__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </div>
+          <h2>Sou Empresa</h2>
+          <p>Publique vagas, gira candidaturas e encontre os melhores talentos para a sua equipa.</p>
+          <ul class="split-cta__list">
+            <li>Publicação de vagas rápida</li>
+            <li>Gestão de candidaturas</li>
+            <li>Visualização de perfis</li>
+            <li>Aceitar / rejeitar candidatos</li>
+          </ul>
+          <div class="split-cta__actions">
+            <button class="btn btn--yellow" onclick="openModal('empresa','register')">Publicar uma Vaga</button>
+            <button class="btn btn--ghost-white" onclick="openModal('empresa','login')">Acesso à Empresa</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VAGAS EM DESTAQUE -->
+  <section class="jobs-preview" id="vagas">
+    <div class="container">
+      <div class="section-header">
+        <h2>Vagas em Destaque</h2>
+        <a href="#" class="link-more" onclick="openModal('colaborador','login'); return false;">Ver todas →</a>
+      </div>
+      <div class="jobs-grid" id="jobsGrid"></div>
+    </div>
+  </section>
+
+  <!-- BANNER -->
+  <section class="banner">
+    <div class="banner__inner">
+      <h2>O talento certo está à sua espera.</h2>
+      <p>Junte-se a mais de 85.000 profissionais e 3.200 empresas que já confiam no Portal Carreiras.</p>
+      <button class="btn btn--white" onclick="openModal('colaborador','register')">Começar agora</button>
+    </div>
+  </section>
+
+  <!-- EMPRESAS -->
+  <section class="companies" id="empresas">
+    <div class="container">
+      <div class="section-header"><h2>Empresas que Confiam em Nós</h2></div>
+      <div class="companies__logos">
+        <div class="company-logo">NovaTech</div>
+        <div class="company-logo">GroupMedia</div>
+        <div class="company-logo">Logística Plus</div>
+        <div class="company-logo">FinServe</div>
+        <div class="company-logo">CreativeHub</div>
+        <div class="company-logo">DataCore</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats">
+    <div class="container stats__grid">
+      <div class="stat"><span class="stat__number">12.400+</span><span class="stat__label">Vagas Ativas</span></div>
+      <div class="stat"><span class="stat__number">85.000+</span><span class="stat__label">Profissionais Registados</span></div>
+      <div class="stat"><span class="stat__number">3.200+</span><span class="stat__label">Empresas Parceiras</span></div>
+      <div class="stat"><span class="stat__number">94%</span><span class="stat__label">Taxa de Satisfação</span></div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <a href="index.html" class="navbar__logo"><img src="logo-icon.svg" alt="Portal Carreiras" /><div class="navbar__logo-text"><span>Portal</span><span>Carreiras</span></div></a>
+        <p>A plataforma que conecta talento e oportunidade.</p>
+      </div>
+      <div class="footer__links">
+        <div>
+          <h4>Colaboradores</h4>
+          <a href="#" onclick="openModal('colaborador','login')">Pesquisar Vagas</a>
+          <a href="#" onclick="openModal('colaborador','register')">Criar Perfil</a>
+        </div>
+        <div>
+          <h4>Empresas</h4>
+          <a href="#" onclick="openModal('empresa','register')">Publicar Vaga</a>
+          <a href="#" onclick="openModal('empresa','login')">Acesso Empresa</a>
+        </div>
+        <div>
+          <h4>Suporte</h4>
+          <a href="#">Centro de Ajuda</a>
+          <a href="#">Contacto</a>
+          <a href="#">Privacidade</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <p>© 2026 Portal Carreiras. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- AUTH MODAL -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+    <div class="modal" id="modal" onclick="event.stopPropagation()">
+      <button class="modal__close" onclick="closeModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="modal__header">
+        <div class="modal__type-tabs">
+          <button class="modal__type-tab active" id="tabColaborador" onclick="switchType('colaborador')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Colaborador
+          </button>
+          <button class="modal__type-tab" id="tabEmpresa" onclick="switchType('empresa')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>Empresa
+          </button>
+        </div>
+        <div class="modal__action-tabs">
+          <button class="modal__action-tab active" id="actionLogin" onclick="switchAction('login')">Entrar</button>
+          <button class="modal__action-tab" id="actionRegister" onclick="switchAction('register')">Criar Conta</button>
+        </div>
+      </div>
+
+      <!-- Login Form -->
+      <form class="modal__form" id="loginForm" onsubmit="handleLogin(event)">
+        <h3 id="loginTitle">Bem-vindo de volta</h3>
+        <p class="modal__form-sub" id="loginSub">Entre na sua conta de colaborador</p>
+        <div id="loginAlert"></div>
+        <div class="demo-box" id="demoBox">
+          <strong>Contas de demonstração</strong>
+          <span id="demoCredentials"></span>
+        </div>
+        <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="o.seu@email.com" required /></div>
+        <div class="form-group"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••" required /></div>
+        <div class="form-group form-group--row">
+          <label class="checkbox-label"><input type="checkbox" /> Lembrar-me</label>
+          <a href="#" class="link-small">Esqueci a password</a>
+        </div>
+        <button type="submit" class="btn btn--primary btn--full">Entrar</button>
+        <p class="modal__switch">Não tem conta? <a href="#" onclick="switchAction('register')">Criar agora</a></p>
+      </form>
+
+      <!-- Register Form -->
+      <form class="modal__form hidden" id="registerForm" onsubmit="handleRegister(event)">
+        <h3 id="registerTitle">Criar Conta</h3>
+        <p class="modal__form-sub" id="registerSub">Registe-se como colaborador</p>
+        <div id="registerAlert"></div>
+        <div id="colabFields">
+          <div class="form-group form-group--half">
+            <div><label>Nome</label><input type="text" id="regName" placeholder="Nome" required /></div>
+            <div><label>Apelido</label><input type="text" id="regSurname" placeholder="Apelido" required /></div>
+          </div>
+          <div class="form-group"><label>Cargo / Área</label><input type="text" id="regRole" placeholder="ex: Engenheiro de Software" /></div>
+        </div>
+        <div id="empresaFields" class="hidden">
+          <div class="form-group"><label>Nome da Empresa</label><input type="text" id="regCompanyName" placeholder="ex: Acme Lda." /></div>
+          <div class="form-group">
+            <label>Sector de Actividade</label>
+            <select id="regSector"><option value="">Seleccionar...</option><option>Tecnologia</option><option>Saúde</option><option>Finanças</option><option>Retalho</option><option>Educação</option><option>Outro</option></select>
+          </div>
+        </div>
+        <div class="form-group"><label>Email</label><input type="email" id="regEmail" placeholder="o.seu@email.com" required /></div>
+        <div class="form-group"><label>Password</label><input type="password" id="regPassword" placeholder="Mínimo 8 caracteres" required minlength="8" /></div>
+        <div class="form-group">
+          <label class="checkbox-label"><input type="checkbox" id="regTerms" required /> Aceito os <a href="#">Termos de Uso</a> e a <a href="#">Política de Privacidade</a></label>
+        </div>
+        <button type="submit" class="btn btn--primary btn--full">Criar Conta</button>
+        <p class="modal__switch">Já tem conta? <a href="#" onclick="switchAction('login')">Entrar</a></p>
+      </form>
+    </div>
+  </div>
+
+  <script src="app-data.js"></script>
+  <script>
+    'use strict';
+    let currentType = 'colaborador';
+    let currentAction = 'login';
+
+    // Redirect if already logged in
+    const _sess = getSession();
+    if (_sess) {
+      window.location.href = _sess.type === 'empresa' ? '/empresa.html' : '/colaborador.html';
+    }
+
+    function openModal(type, action) {
+      currentType = type || 'colaborador';
+      currentAction = action || 'login';
+      renderModal();
+      document.getElementById('modalOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    function renderModal() {
+      document.getElementById('tabColaborador').classList.toggle('active', currentType === 'colaborador');
+      document.getElementById('tabEmpresa').classList.toggle('active', currentType === 'empresa');
+      document.getElementById('actionLogin').classList.toggle('active', currentAction === 'login');
+      document.getElementById('actionRegister').classList.toggle('active', currentAction === 'register');
+      document.getElementById('loginForm').classList.toggle('hidden', currentAction !== 'login');
+      document.getElementById('registerForm').classList.toggle('hidden', currentAction !== 'register');
+      document.getElementById('colabFields').classList.toggle('hidden', currentType !== 'colaborador');
+      document.getElementById('empresaFields').classList.toggle('hidden', currentType !== 'empresa');
+      document.getElementById('loginAlert').innerHTML = '';
+      document.getElementById('registerAlert').innerHTML = '';
+      const isEmpresa = currentType === 'empresa';
+      document.getElementById('loginTitle').textContent    = isEmpresa ? 'Acesso Empresa' : 'Bem-vindo de volta';
+      document.getElementById('loginSub').textContent      = isEmpresa ? 'Entre na conta da sua empresa' : 'Entre na sua conta de colaborador';
+      document.getElementById('registerTitle').textContent = isEmpresa ? 'Registar Empresa' : 'Criar Conta';
+      document.getElementById('registerSub').textContent   = isEmpresa ? 'Publique vagas e encontre talento' : 'Registe-se como colaborador';
+      // Demo credentials
+      document.getElementById('demoCredentials').innerHTML = isEmpresa
+        ? '<br>📧 <code>rh@novatech.pt</code> &nbsp; 🔑 <code>demo123</code><br>📧 <code>rh@creativehub.pt</code> &nbsp; 🔑 <code>demo123</code>'
+        : '<br>📧 <code>joao@email.com</code> &nbsp; 🔑 <code>demo123</code><br>📧 <code>ana@email.com</code> &nbsp; 🔑 <code>demo123</code>';
+    }
+    function switchType(t)   { currentType = t;   renderModal(); }
+    function switchAction(a) { currentAction = a; renderModal(); }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const pass  = document.getElementById('loginPassword').value;
+      const user  = loginUser(email, pass);
+      if (!user) {
+        document.getElementById('loginAlert').innerHTML = '<div class="alert alert--error">Email ou password incorrectos.</div>';
+        return;
+      }
+      if (user.type !== currentType) {
+        document.getElementById('loginAlert').innerHTML = `<div class="alert alert--error">Esta conta é do tipo "${user.type === 'empresa' ? 'Empresa' : 'Colaborador'}". Seleccione o tipo correcto.</div>`;
+        return;
+      }
+      setSession(user);
+      window.location.href = user.type === 'empresa' ? '/empresa.html' : '/colaborador.html';
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const isEmpresa = currentType === 'empresa';
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const data = isEmpresa
+        ? { type: 'empresa', email, password, companyName: document.getElementById('regCompanyName').value.trim(), sector: document.getElementById('regSector').value, avatar: document.getElementById('regCompanyName').value.trim().slice(0,2).toUpperCase() || 'EM' }
+        : { type: 'colaborador', email, password, name: document.getElementById('regName').value.trim(), surname: document.getElementById('regSurname').value.trim(), role: document.getElementById('regRole').value.trim(), skills: [], experience: [], education: [], avatar: (document.getElementById('regName').value[0] || '') + (document.getElementById('regSurname').value[0] || '') };
+      const result = registerUser(data);
+      if (result.error) {
+        document.getElementById('registerAlert').innerHTML = `<div class="alert alert--error">${result.error}</div>`;
+        return;
+      }
+      setSession(result.user);
+      window.location.href = result.user.type === 'empresa' ? '/empresa.html' : '/colaborador.html';
+    }
+
+    function handleSearch(e) {
+      e.preventDefault();
+      document.getElementById('vagas').scrollIntoView({ behavior: 'smooth' });
+    }
+    function quickSearch(q) {
+      document.getElementById('searchQuery').value = q;
+      document.getElementById('vagas').scrollIntoView({ behavior: 'smooth' });
+    }
+    function toggleMenu() { document.querySelector('.navbar__links').classList.toggle('open'); }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+    document.addEventListener('click', e => {
+      const nav = document.querySelector('.navbar__links');
+      const burger = document.querySelector('.navbar__burger');
+      if (nav && nav.classList.contains('open') && !nav.contains(e.target) && !burger.contains(e.target)) nav.classList.remove('open');
+    });
+
+    // Render preview jobs on landing
+    document.addEventListener('DOMContentLoaded', () => {
+      const jobs = getJobs().slice(0, 6);
+      const grid = document.getElementById('jobsGrid');
+      grid.innerHTML = jobs.map(j => `
+        <article class="job-card" onclick="openModal('colaborador','login')">
+          <div class="job-card__top">
+            <div class="job-card__logo">${j.companyAvatar}</div>
+            <span class="job-card__badge badge--new">Novo</span>
+          </div>
+          <div class="job-card__title">${j.title}</div>
+          <div class="job-card__company">${j.companyName} · ${j.location}</div>
+          <div class="job-card__tags">
+            <span class="job-card__tag">${j.type}</span>
+            ${j.tags.map(t => `<span class="job-card__tag">${t}</span>`).join('')}
+          </div>
+          <div class="job-card__footer">
+            <span class="job-card__salary">${j.salary}</span>
+            <span>${daysAgo(j.posted)}</span>
+          </div>
+        </article>
+      `).join('');
+    });
+  </script>
+</body>
+</html>

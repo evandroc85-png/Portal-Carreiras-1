@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal Carreiras — Área do Colaborador</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    .badge-count { display:inline-flex;align-items:center;justify-content:center;background:var(--blue);color:white;font-size:11px;font-weight:700;min-width:18px;height:18px;border-radius:9px;padding:0 5px;margin-left:4px; }
+    /* Profile layout */
+    .profile-layout { display:grid;grid-template-columns:260px 1fr;gap:24px;align-items:start; }
+    .profile-sidebar { background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;position:sticky;top:88px; }
+    .profile-sidebar__top { background:linear-gradient(135deg,var(--blue-deep) 0%,var(--blue) 100%);padding:28px 20px 24px;text-align:center;color:white; }
+    .profile-sidebar__avatar { width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;margin:0 auto 10px;border:3px solid rgba(255,255,255,.4); }
+    .profile-sidebar__name { font-size:16px;font-weight:700;margin-bottom:3px; }
+    .profile-sidebar__role { font-size:13px;opacity:.8; }
+    .profile-sidebar__nav { padding:8px; }
+    .profile-nav-item { display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius);font-size:14px;font-weight:500;color:var(--gray);cursor:pointer;transition:var(--transition);border:none;background:none;font-family:inherit;width:100%;text-align:left; }
+    .profile-nav-item svg { width:16px;height:16px;flex-shrink:0; }
+    .profile-nav-item:hover { background:var(--gray-light);color:var(--dark); }
+    .profile-nav-item.active { background:var(--blue-light);color:var(--blue);font-weight:600; }
+    .profile-nav-divider { height:1px;background:var(--border);margin:6px 8px; }
+    .profile-subpage { display:none; }
+    .profile-subpage.active { display:block; }
+    .profile-section-card { background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;margin-bottom:20px; }
+    .profile-section-card__header { display:flex;align-items:center;justify-content:space-between;margin-bottom:20px; }
+    .profile-section-card__header h3 { font-size:16px;font-weight:700; }
+    .profile-section-card__header p { font-size:13px;color:var(--gray);margin-top:2px; }
+    .exp-entry { border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;position:relative; }
+    .exp-entry__remove { position:absolute;top:12px;right:12px;background:none;border:none;cursor:pointer;color:var(--gray);padding:2px;transition:var(--transition); }
+    .exp-entry__remove:hover { color:var(--red); }
+    .exp-entry__remove svg { width:16px;height:16px; }
+    .skills-input-wrap { display:flex;gap:8px;margin-bottom:12px; }
+    .skills-tags { display:flex;flex-wrap:wrap;gap:8px; }
+    .skill-tag-edit { display:flex;align-items:center;gap:5px;font-size:13px;padding:5px 12px;border-radius:20px;background:var(--blue-light);color:var(--blue);font-weight:500; }
+    .skill-tag-edit button { background:none;border:none;cursor:pointer;color:var(--blue);opacity:.6;padding:0;line-height:1;font-size:15px; }
+    .skill-tag-edit button:hover { opacity:1; }
+    .progress-bar-wrap { background:rgba(255,255,255,.2);border-radius:8px;height:6px;overflow:hidden;margin-top:8px; }
+    .progress-bar { height:100%;border-radius:8px;background:rgba(255,255,255,.8);transition:width .4s ease; }
+    .cv-drop-zone { border:2px dashed var(--border);border-radius:var(--radius-lg);padding:36px 24px;text-align:center;cursor:pointer;transition:border-color var(--transition),background var(--transition); }
+    .cv-drop-zone:hover,.cv-drop-zone.drag-over { border-color:var(--blue);background:var(--blue-pale); }
+    .cv-drop-zone svg { width:36px;height:36px;color:var(--blue);opacity:.6;margin-bottom:10px; }
+    .cv-uploaded { background:var(--blue-pale);border:1px solid #bfdbfe;border-radius:var(--radius-lg);padding:14px 18px;display:flex;align-items:center;gap:12px; }
+    .cv-uploaded__icon { width:40px;height:40px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+    .cv-uploaded__icon svg { width:20px;height:20px;color:white; }
+    .cv-uploaded__info { flex:1;min-width:0; }
+    .cv-uploaded__name { font-size:14px;font-weight:600;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+    .cv-uploaded__meta { font-size:12px;color:var(--gray);margin-top:2px; }
+    .cv-uploaded__actions { display:flex;gap:8px;flex-shrink:0; }
+    @media(max-width:860px){.profile-layout{grid-template-columns:1fr;}.profile-sidebar{position:static;}}
+  </style>
+</head>
+<body class="dash-body">
+
+  <header class="dash-navbar">
+    <div class="container">
+      <a href="index.html" class="navbar__logo"><img src="logo-icon.svg" alt="Portal Carreiras" /><div class="navbar__logo-text"><span>Portal</span><span>Carreiras</span></div></a>
+      <nav class="dash-nav-links">
+        <button class="dash-nav-link active" onclick="showPage('pesquisar')" id="navPesquisar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Vagas
+        </button>
+        <button class="dash-nav-link" onclick="showPage('guardadas')" id="navGuardadas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>Guardadas<span class="badge-count" id="savedCount" style="display:none"></span>
+        </button>
+        <button class="dash-nav-link" onclick="showPage('recomendadas')" id="navRecomendadas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Para Si
+        </button>
+        <button class="dash-nav-link" onclick="showPage('candidaturas')" id="navCandidaturas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Candidaturas<span class="badge-count" id="appCount" style="display:none"></span>
+        </button>
+        <button class="dash-nav-link" onclick="showPage('mensagens')" id="navMensagens">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Mensagens<span class="unread-dot" id="msgDot" style="display:none"></span>
+        </button>
+        <button class="dash-nav-link" onclick="showPage('alertas')" id="navAlertas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Alertas
+        </button>
+        <button class="dash-nav-link" onclick="showPage('eventos')" id="navEventos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Eventos
+        </button>
+        <button class="dash-nav-link" onclick="showPage('testes')" id="navTestes">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Testes
+        </button>
+        <button class="dash-nav-link" onclick="showPage('salarios')" id="navSalarios">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Salários
+        </button>
+        <button class="dash-nav-link" onclick="showPage('perfil')" id="navPerfil">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Perfil
+        </button>
+      </nav>
+      <div class="navbar__user" style="position:relative">
+        <!-- Notifications bell -->
+        <div style="position:relative">
+          <button class="btn btn--ghost btn--sm notif-btn" id="notifBell" onclick="toggleNotifPanel()" style="padding:6px 10px;position:relative">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="notif-dot" id="notifDot" style="display:none"></span>
+          </button>
+          <div class="notif-dropdown" id="notifDropdown" style="display:none">
+            <div class="notif-dropdown__header">
+              <span class="notif-dropdown__title">Notificações</span>
+              <button onclick="markAllRead()" style="font-size:12px;color:var(--blue);background:none;border:none;cursor:pointer">Marcar tudo como lido</button>
+            </div>
+            <div id="notifList"></div>
+          </div>
+        </div>
+        <div class="avatar" style="width:34px;height:34px;font-size:12px" id="userAvatar">?</div>
+        <span class="navbar__user-name" id="userName">—</span>
+        <button class="btn btn--ghost btn--sm" onclick="logout()">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dash-main">
+    <div class="container">
+
+      <!-- ===== PESQUISAR ===== -->
+      <div class="dash-page active" id="pagePesquisar">
+        <div class="page-header"><h1>Pesquisar Vagas</h1><p>Encontre a oportunidade certa para si</p></div>
+
+        <!-- Advanced filters -->
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px">
+          <div class="filter-bar" style="margin-bottom:12px">
+            <div class="search-history-wrap">
+              <input type="text" id="searchQ" placeholder="Cargo, empresa ou tecnologia..." oninput="renderJobs()" onfocus="showHistory()" onblur="setTimeout(hideHistory,200)" />
+              <div class="search-history-dropdown hidden" id="searchHistoryDrop"></div>
+            </div>
+            <input type="text" id="searchL" placeholder="Localização..." oninput="renderJobs()" style="max-width:200px" />
+            <button class="btn btn--primary" onclick="doSearch()">Pesquisar</button>
+          </div>
+          <div class="filter-bar" style="margin-bottom:0">
+            <select id="searchType" onchange="renderJobs()">
+              <option value="">Tipo de contrato</option>
+              <option>Full-time</option><option>Part-time</option><option>Freelance</option><option>Estágio</option>
+            </select>
+            <select id="searchExp" onchange="renderJobs()">
+              <option value="">Nível de experiência</option>
+              <option value="Júnior (0-2 anos)">Júnior</option>
+              <option value="Pleno (2-5 anos)">Pleno</option>
+              <option value="Sénior (5+ anos)">Sénior</option>
+            </select>
+            <select id="searchSalary" onchange="renderJobs()">
+              <option value="">Salário mínimo</option>
+              <option value="1500">1.500 €+</option>
+              <option value="2000">2.000 €+</option>
+              <option value="3000">3.000 €+</option>
+              <option value="4000">4.000 €+</option>
+            </select>
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;white-space:nowrap">
+              <input type="checkbox" id="searchFeatured" onchange="renderJobs()" /> Só destaques
+            </label>
+            <button class="btn btn--ghost btn--sm" onclick="clearFilters()">Limpar</button>
+          </div>
+        </div>
+
+        <div class="job-detail-layout">
+          <div>
+            <div id="jobCount" style="font-size:13px;color:var(--gray);margin-bottom:14px"></div>
+            <div id="jobsGrid" style="display:flex;flex-direction:column;gap:10px"></div>
+          </div>
+          <div class="job-detail-panel" id="jobDetailPanel">
+            <div class="no-detail">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              <p>Seleccione uma vaga para ver os detalhes</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== GUARDADAS ===== -->
+      <div class="dash-page" id="pageGuardadas">
+        <div class="page-header"><h1>Vagas Guardadas</h1><p>As vagas que marcou para consultar mais tarde</p></div>
+        <div id="savedList"></div>
+      </div>
+
+      <!-- ===== RECOMENDADAS ===== -->
+      <div class="dash-page" id="pageRecomendadas">
+        <div class="page-header"><h1>Recomendadas Para Si</h1><p>Vagas seleccionadas com base no seu perfil e competências</p></div>
+        <div id="notifBanner"></div>
+        <div id="recommendedGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px"></div>
+      </div>
+
+      <!-- ===== CANDIDATURAS ===== -->
+      <div class="dash-page" id="pageCandidaturas">
+        <div class="page-header"><h1>As Minhas Candidaturas</h1><p>Acompanhe o estado de todas as candidaturas</p></div>
+        <div class="filter-bar" style="margin-bottom:20px">
+          <select id="filterStatus" onchange="renderApplications()">
+            <option value="">Todos os estados</option>
+            <option value="pendente">Pendente</option>
+            <option value="em_analise">Em Análise</option>
+            <option value="aceite">Aceite</option>
+            <option value="rejeitado">Rejeitado</option>
+          </select>
+        </div>
+        <div id="applicationsList"></div>
+      </div>
+
+      <!-- ===== MENSAGENS ===== -->
+      <div class="dash-page" id="pageMensagens">
+        <div class="page-header"><h1>Mensagens</h1><p>Comunicação com as empresas sobre as suas candidaturas</p></div>
+        <div style="display:grid;grid-template-columns:280px 1fr;gap:20px;align-items:start" id="msgLayout">
+          <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+            <div style="padding:16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.5px">Conversas</div>
+            <div id="msgThreadList"></div>
+          </div>
+          <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden" id="msgPanel">
+            <div class="chat-empty">Seleccione uma conversa</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ALERTAS ===== -->
+      <div class="dash-page" id="pageAlertas">
+        <div class="page-header"><h1>Alertas de Emprego</h1><p>Seja notificado quando aparecerem vagas que correspondem ao seu perfil</p></div>
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;max-width:560px;margin-bottom:24px">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:16px">Criar Novo Alerta</h3>
+          <div class="form-group"><label>Palavras-chave</label><input type="text" id="alertQuery" placeholder="ex: React Developer, UX Designer..." /></div>
+          <div class="form-group form-group--half">
+            <div><label>Localização</label><input type="text" id="alertLocation" placeholder="ex: Lisboa (opcional)" /></div>
+            <div>
+              <label>Frequência</label>
+              <select id="alertFreq"><option value="diário">Diário</option><option value="semanal">Semanal</option><option value="mensal">Mensal</option></select>
+            </div>
+          </div>
+          <button class="btn btn--primary" onclick="createNewAlert()">Criar Alerta</button>
+        </div>
+        <div id="alertsList"></div>
+      </div>
+
+      <!-- ===== EVENTOS ===== -->
+      <div class="dash-page" id="pageEventos">
+        <div class="page-header"><h1>Eventos de Recrutamento</h1><p>Job fairs, dias abertos e encontros com empresas</p></div>
+        <div id="eventosList" style="display:flex;flex-direction:column;gap:14px"></div>
+      </div>
+
+      <!-- ===== TESTES ===== -->
+      <div class="dash-page" id="pageTestes">
+        <div class="page-header">
+          <div><h1>Testes de Competências</h1><p>Valide as suas competências e destaque-se perante os recrutadores</p></div>
+        </div>
+        <div id="testCompletedBanner" style="margin-bottom:20px"></div>
+        <div class="tests-grid" id="testsList"></div>
+        <!-- Test modal (inline) -->
+        <div class="modal-overlay" id="testModal" onclick="closeTestModal()">
+          <div class="modal" style="max-width:540px" onclick="event.stopPropagation()">
+            <button class="modal__close" onclick="closeTestModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            <div id="testModalContent"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SALÁRIOS ===== -->
+      <div class="dash-page" id="pageSalarios">
+        <div class="page-header"><h1>Calculadora Salarial</h1><p>Compare salários por função e localização no mercado português</p></div>
+        <div class="salary-calc" style="max-width:760px">
+          <div class="salary-calc__header">
+            <h2>Pesquisar Salário</h2>
+            <p>Dados do mercado de trabalho em Portugal</p>
+          </div>
+          <div class="salary-calc__form">
+            <div>
+              <label style="font-size:12px;font-weight:600;color:var(--dark);display:block;margin-bottom:6px">Função / Cargo</label>
+              <select id="salRole" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;outline:none;background:white">
+                <option value="">Seleccionar função...</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:600;color:var(--dark);display:block;margin-bottom:6px">Localização</label>
+              <select id="salLocation" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;outline:none;background:white">
+                <option value="">Todas as localizações</option>
+                <option>Lisboa</option><option>Porto</option><option>Remoto</option>
+              </select>
+            </div>
+            <button class="btn btn--primary" onclick="calcSalary()">Pesquisar</button>
+          </div>
+          <div class="salary-calc__result" id="salResult" style="display:none"></div>
+        </div>
+        <div style="margin-top:32px;max-width:760px">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:16px">Vagas com salário indicado</h3>
+          <div id="salJobsList"></div>
+        </div>
+      </div>
+
+      <!-- ===== PERFIL ===== -->
+      <div class="dash-page" id="pagePerfil">
+        <div class="page-header"><h1>O Meu Perfil</h1><p>Complete o perfil para aumentar a visibilidade para recrutadores</p></div>
+        <div class="profile-layout">
+          <aside class="profile-sidebar">
+            <div class="profile-sidebar__top">
+              <div class="profile-sidebar__avatar" id="sidebarAvatar">?</div>
+              <div class="profile-sidebar__name" id="sidebarName">—</div>
+              <div class="profile-sidebar__role" id="sidebarRole">—</div>
+              <div style="margin-top:10px">
+                <div style="font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Perfil completo</div>
+                <div class="progress-bar-wrap"><div class="progress-bar" id="profileProgress" style="width:0%"></div></div>
+                <div style="font-size:12px;opacity:.8;margin-top:3px" id="profileProgressLabel">0%</div>
+              </div>
+            </div>
+            <nav class="profile-sidebar__nav">
+              <button class="profile-nav-item active" onclick="showProfileSection('info')" id="pnavInfo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Informação Pessoal
+              </button>
+              <button class="profile-nav-item" onclick="showProfileSection('skills')" id="pnavSkills">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Competências
+              </button>
+              <button class="profile-nav-item" onclick="showProfileSection('experience')" id="pnavExperience">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>Experiência
+              </button>
+              <button class="profile-nav-item" onclick="showProfileSection('education')" id="pnavEducation">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>Educação
+              </button>
+              <div class="profile-nav-divider"></div>
+              <button class="profile-nav-item" onclick="showProfileSection('cv')" id="pnavCv">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Curriculum Vitae
+              </button>
+            </nav>
+          </aside>
+
+          <div>
+            <!-- Info Pessoal -->
+            <div class="profile-subpage active" id="sectionInfo">
+              <div class="profile-section-card">
+                <div class="profile-section-card__header"><div><h3>Informação Pessoal</h3><p>Dados básicos e apresentação</p></div></div>
+                <form onsubmit="savePersonalInfo(event)">
+                  <div class="form-group form-group--half">
+                    <div><label>Nome</label><input type="text" id="piName" required /></div>
+                    <div><label>Apelido</label><input type="text" id="piSurname" required /></div>
+                  </div>
+                  <div class="form-group"><label>Cargo / Área Profissional</label><input type="text" id="piRole" placeholder="ex: Engenheiro de Software" /></div>
+                  <div class="form-group form-group--half">
+                    <div><label>Localização</label><input type="text" id="piLocation" placeholder="ex: Lisboa" /></div>
+                    <div><label>Telefone</label><input type="text" id="piPhone" placeholder="+351 9xx xxx xxx" /></div>
+                  </div>
+                  <div class="form-group"><label>Email de contacto</label><input type="email" id="piEmail" /><div class="form-hint">Partilhado com empresas ao candidatar-se.</div></div>
+                  <div class="form-group"><label>Sobre mim</label><textarea id="piAbout" rows="5" placeholder="Apresentação profissional..."></textarea><div class="form-hint"><span id="aboutCount">0</span>/600</div></div>
+                  <div class="form-group form-group--half">
+                    <div>
+                      <label>Disponibilidade</label>
+                      <select id="piAvailability">
+                        <option value="active">À procura activamente</option>
+                        <option value="open">Aberto a propostas</option>
+                        <option value="unavailable">Não disponível</option>
+                      </select>
+                      <div class="form-hint">Visível pelos recrutadores no seu perfil</div>
+                    </div>
+                    <div>
+                      <label>Visibilidade do perfil</label>
+                      <select id="piVisibility">
+                        <option value="all">Todas as empresas</option>
+                        <option value="applied">Só empresas às quais me candidatei</option>
+                        <option value="none">Perfil oculto</option>
+                      </select>
+                      <div class="form-hint">Controla quem pode ver o seu perfil</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;justify-content:flex-end"><button type="submit" class="btn btn--primary">Guardar</button></div>
+                </form>
+              </div>
+            </div>
+            <!-- Skills -->
+            <div class="profile-subpage" id="sectionSkills">
+              <div class="profile-section-card">
+                <div class="profile-section-card__header"><div><h3>Competências</h3><p>Tecnologias, ferramentas e áreas de conhecimento</p></div></div>
+                <div class="form-group">
+                  <label>Adicionar competência</label>
+                  <div class="skills-input-wrap">
+                    <input type="text" id="skillInput" placeholder="ex: Python, Figma..." style="flex:1" onkeydown="if(event.key==='Enter'){event.preventDefault();addSkill();}" />
+                    <button type="button" class="btn btn--primary" onclick="addSkill()">Adicionar</button>
+                  </div>
+                </div>
+                <div class="skills-tags" id="skillsTags"></div>
+                <div style="margin-top:20px;display:flex;justify-content:flex-end"><button class="btn btn--primary" onclick="saveSkills()">Guardar</button></div>
+              </div>
+            </div>
+            <!-- Experiência -->
+            <div class="profile-subpage" id="sectionExperience">
+              <div class="profile-section-card">
+                <div class="profile-section-card__header"><div><h3>Experiência Profissional</h3></div><button type="button" class="btn btn--ghost btn--sm" onclick="addExpEntry()">+ Adicionar</button></div>
+                <div id="expEntries"></div>
+                <div style="margin-top:8px;display:flex;justify-content:flex-end"><button class="btn btn--primary" onclick="saveExperience()">Guardar</button></div>
+              </div>
+            </div>
+            <!-- Educação -->
+            <div class="profile-subpage" id="sectionEducation">
+              <div class="profile-section-card">
+                <div class="profile-section-card__header"><div><h3>Educação &amp; Formação</h3></div><button type="button" class="btn btn--ghost btn--sm" onclick="addEduEntry()">+ Adicionar</button></div>
+                <div id="eduEntries"></div>
+                <div style="margin-top:8px;display:flex;justify-content:flex-end"><button class="btn btn--primary" onclick="saveEducation()">Guardar</button></div>
+              </div>
+            </div>
+            <!-- CV -->
+            <div class="profile-subpage" id="sectionCv">
+              <div class="profile-section-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:4px">Curriculum Vitae</h3>
+                <p style="font-size:13px;color:var(--gray);margin-bottom:20px">Carregue o seu CV em PDF ou Word. As empresas podem consultá-lo.</p>
+                <div id="cvUploadedState" class="hidden">
+                  <div class="cv-uploaded" id="cvInfo">
+                    <div class="cv-uploaded__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                    <div class="cv-uploaded__info"><div class="cv-uploaded__name" id="cvFileName">—</div><div class="cv-uploaded__meta" id="cvFileMeta">—</div></div>
+                    <div class="cv-uploaded__actions">
+                      <button class="btn btn--primary btn--sm" onclick="downloadCV()">Descarregar</button>
+                      <button class="btn btn--ghost btn--sm" onclick="triggerCVPicker()">Substituir</button>
+                      <button class="btn btn--danger btn--sm" onclick="removeCVFile()">Remover</button>
+                    </div>
+                  </div>
+                  <div class="alert alert--success" style="margin-top:12px">✓ CV carregado e visível para as empresas.</div>
+                </div>
+                <div id="cvDropZone" class="cv-drop-zone" onclick="triggerCVPicker()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+                  <input type="file" id="cvFileInput" accept=".pdf,.doc,.docx" onchange="handleCVFile(this.files[0])" style="display:none" />
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  <p>Arraste o CV aqui ou <strong style="color:var(--blue)">clique para seleccionar</strong></p>
+                  <span style="font-size:12px;color:var(--gray-2)">PDF, DOC, DOCX · Máx. 5 MB</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- COMPARE BAR -->
+  <div class="compare-bar" id="compareBar">
+    <span class="compare-bar__label">Comparar:</span>
+    <div class="compare-bar__jobs" id="compareJobTags"></div>
+    <button class="btn btn--primary btn--sm" onclick="openCompareModal()">Comparar</button>
+    <button class="btn btn--ghost btn--sm" style="color:white;border-color:rgba(255,255,255,.3)" onclick="clearCompare()">Limpar</button>
+  </div>
+
+  <!-- COMPARE MODAL -->
+  <div class="modal-overlay" id="compareModal" onclick="closeCompareModal()">
+    <div class="modal" style="max-width:820px;overflow-x:auto" onclick="event.stopPropagation()">
+      <button class="modal__close" onclick="closeCompareModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <h3 style="font-size:18px;font-weight:700;margin-bottom:20px">Comparar Vagas</h3>
+      <div id="compareTableWrap"></div>
+    </div>
+  </div>
+
+  <!-- APPLY MODAL (with screening questions) -->
+  <div class="modal-overlay" id="applyModal" onclick="closeApplyModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <button class="modal__close" onclick="closeApplyModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <div id="applyModalContent"></div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="app-data.js"></script>
+  <script>
+    'use strict';
+    let currentUser = requireAuth('colaborador');
+    let selectedJobId = null;
+    let currentSkills = [], currentExp = [], currentEdu = [];
+    let activeThread = null;
+    let compareIds = [];
+
+    function initUI() {
+      document.getElementById('userAvatar').textContent = currentUser.avatar || '';
+      document.getElementById('userName').textContent = (currentUser.name || '') + ' ' + (currentUser.surname || '');
+      updateCounts();
+      updateNotifBell();
+      checkNewAlerts();
+      initSalaryRoles();
+    }
+
+    function logout() { clearSession(); window.location.href = '/'; }
+
+    /* ---- NAVIGATION ---- */
+    function showPage(page) {
+      document.querySelectorAll('.dash-page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.dash-nav-link').forEach(l => l.classList.remove('active'));
+      const key = page[0].toUpperCase() + page.slice(1);
+      document.getElementById('page' + key).classList.add('active');
+      document.getElementById('nav'  + key).classList.add('active');
+      if (page === 'pesquisar')    renderJobs();
+      if (page === 'guardadas')    renderSaved();
+      if (page === 'recomendadas') renderRecommended();
+      if (page === 'candidaturas') renderApplications();
+      if (page === 'mensagens')    renderMessages();
+      if (page === 'alertas')      renderAlerts();
+      if (page === 'eventos')      renderEventos();
+      if (page === 'testes')       renderTestes();
+      if (page === 'salarios')     renderSalarios();
+      if (page === 'perfil')       initProfilePage();
+    }
+
+    function updateCounts() {
+      const saved  = getSavedJobsForUser(currentUser.id).length;
+      const apps   = getApplicationsByUser(currentUser.id).length;
+      const unread = getUnreadCount(currentUser.id, 'colaborador');
+      const sc = document.getElementById('savedCount');
+      const ac = document.getElementById('appCount');
+      const md = document.getElementById('msgDot');
+      sc.textContent = saved; sc.style.display = saved > 0 ? 'inline-flex' : 'none';
+      ac.textContent = apps;  ac.style.display = apps  > 0 ? 'inline-flex' : 'none';
+      md.style.display = unread > 0 ? 'inline-block' : 'none';
+    }
+
+    /* ---- NOTIFICATIONS ---- */
+    function updateNotifBell() {
+      const count = getUnreadNotifCount(currentUser.id);
+      document.getElementById('notifDot').style.display = count > 0 ? 'block' : 'none';
+    }
+    function toggleNotifPanel() {
+      const panel = document.getElementById('notifDropdown');
+      const isOpen = panel.style.display !== 'none';
+      panel.style.display = isOpen ? 'none' : 'block';
+      if (!isOpen) renderNotifList();
+    }
+    function renderNotifList() {
+      const notifs = getNotificationsForUser(currentUser.id);
+      const list   = document.getElementById('notifList');
+      if (!notifs.length) { list.innerHTML = '<div class="notif-empty">Sem notificações.</div>'; return; }
+      const icons = { status: '✅', message: '💬', interview: '📅', alert: '🔔' };
+      list.innerHTML = notifs.slice(0, 10).map(n => `
+        <div class="notif-item ${n.read ? '' : 'notif-item--unread'}" onclick="markNotifRead('${n.id}');updateNotifBell();renderNotifList()">
+          <div class="notif-item__icon notif-item__icon--${n.type}">${icons[n.type] || '🔔'}</div>
+          <div class="notif-item__body">
+            <div class="notif-item__title">${n.title}</div>
+            <div class="notif-item__msg">${n.message}</div>
+            <div class="notif-item__date">${formatDateTime(n.date)}</div>
+          </div>
+        </div>`).join('');
+    }
+    function markAllRead() { markAllNotifsRead(currentUser.id); updateNotifBell(); renderNotifList(); }
+    document.addEventListener('click', e => {
+      const bell = document.getElementById('notifBell');
+      const panel = document.getElementById('notifDropdown');
+      if (bell && panel && !bell.contains(e.target) && !panel.contains(e.target)) panel.style.display = 'none';
+    });
+
+    function checkNewAlerts() {
+      const alerts = getAlertsForUser(currentUser.id);
+      if (!alerts.length) return;
+      const banner = document.createElement('div');
+      banner.innerHTML = `<div class="notif-banner" style="margin-top:16px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <p>Tem ${alerts.length} alerta(s) activo(s). Novas vagas que correspondem ao seu perfil foram encontradas!</p>
+        <button onclick="showPage('alertas');this.closest('.notif-banner').remove()">Ver Alertas</button>
+      </div>`;
+    }
+
+    /* ---- JOB SEARCH ---- */
+    function doSearch() {
+      const q = document.getElementById('searchQ').value.trim();
+      if (q) addSearchHistory(currentUser.id, q);
+      renderJobs();
+    }
+    function clearFilters() {
+      ['searchQ','searchL'].forEach(id => document.getElementById(id).value = '');
+      ['searchType','searchExp','searchSalary'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('searchFeatured').checked = false;
+      renderJobs();
+    }
+    function showHistory() {
+      const hist = getSearchHistory(currentUser.id);
+      const drop = document.getElementById('searchHistoryDrop');
+      if (!hist.length) return;
+      drop.innerHTML = `<div style="padding:8px 14px;font-size:11px;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between;align-items:center">Pesquisas recentes <button onclick="clearSearchHistory('${currentUser.id}');hideHistory()" style="background:none;border:none;font-size:12px;color:var(--blue);cursor:pointer">Limpar</button></div>` +
+        hist.map(h => `<div class="search-history-item" onclick="document.getElementById('searchQ').value='${h}';renderJobs();hideHistory()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.36"/></svg>${h}</div>`).join('');
+      drop.classList.remove('hidden');
+    }
+    function hideHistory() { document.getElementById('searchHistoryDrop').classList.add('hidden'); }
+
+    function renderJobs() {
+      const q   = document.getElementById('searchQ').value;
+      const l   = document.getElementById('searchL').value;
+      const filters = {
+        type:      document.getElementById('searchType').value,
+        experience:document.getElementById('searchExp').value,
+        salaryMin: document.getElementById('searchSalary').value,
+        featured:  document.getElementById('searchFeatured').checked,
+      };
+      let jobs = searchJobs(q, l, filters);
+      const hidden = getHiddenJobIdsForUser(currentUser.id);
+      jobs = jobs.filter(j => !hidden.includes(j.id));
+      jobs.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+      document.getElementById('jobCount').textContent = `${jobs.length} vaga${jobs.length !== 1 ? 's' : ''} encontrada${jobs.length !== 1 ? 's' : ''}`;
+      const grid = document.getElementById('jobsGrid');
+      if (!jobs.length) { grid.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><h3>Nenhuma vaga encontrada</h3><p>Ajuste os filtros.</p></div>`; return; }
+      grid.innerHTML = jobs.map(j => jobCard(j, j.id === selectedJobId)).join('');
+    }
+
+    function jobCard(j, selected) {
+      const applied  = hasApplied(j.id, currentUser.id);
+      const saved    = isJobSaved(currentUser.id, j.id);
+      const avg      = getAverageRating(j.companyId);
+      const inCompare = compareIds.includes(j.id);
+      return `<article class="job-card ${j.featured ? 'job-card--featured' : ''}" onclick="selectJob('${j.id}')" style="${selected ? 'border-color:var(--blue);box-shadow:var(--shadow-md)' : ''}">
+        <div class="job-card__top">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="job-card__logo">${j.companyAvatar}</div>
+            <div>
+              <div class="job-card__title" style="margin-bottom:0">${j.title}</div>
+              <div class="job-card__company" style="margin-bottom:0">${j.companyName} · ${j.location}</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            ${j.featured ? '<span class="featured-badge">★ Destaque</span>' : ''}
+            ${applied ? '<span class="job-card__badge badge--applied">✓ Candidatado</span>' : ''}
+            <button onclick="event.stopPropagation();toggleSave('${j.id}')" style="background:none;border:none;cursor:pointer;font-size:18px;color:${saved ? 'var(--gold-light)' : 'var(--gray)'}" title="${saved ? 'Remover dos guardados' : 'Guardar vaga'}">♥</button>
+          </div>
+        </div>
+        <div class="job-card__tags" style="margin-top:6px">
+          <span class="job-card__tag">${j.type}</span>
+          ${j.experience ? `<span class="job-card__tag">${j.experience}</span>` : ''}
+          ${j.tags.map(t => `<span class="job-card__tag">${t}</span>`).join('')}
+        </div>
+        <div class="job-card__footer">
+          <span class="job-card__salary">${j.salary}</span>
+          <span style="display:flex;align-items:center;gap:6px">
+            ${avg ? `<span class="stars-row">${starsHTML(avg, false, '')} <span class="rating-num">${avg}</span></span>` : ''}
+            <span style="color:var(--gray-2)">${daysAgo(j.posted)}</span>
+          </span>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)" onclick="event.stopPropagation()">
+          <button class="compare-btn ${inCompare ? 'selected' : ''}" onclick="toggleCompare('${j.id}')" title="Comparar vaga">
+            ${inCompare ? '✓ Comparando' : '⊕ Comparar'}
+          </button>
+          <button onclick="doHideJob('${j.id}')" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--gray);padding:4px 8px;border-radius:var(--radius);transition:var(--transition)" onmouseover="this.style.background='var(--gray-light)'" onmouseout="this.style.background='none'" title="Não tenho interesse">
+            ✕ Não tenho interesse
+          </button>
+        </div>
+      </article>`;
+    }
+
+    function selectJob(jobId) {
+      selectedJobId = jobId;
+      renderJobs();
+      const job = getJobById(jobId);
+      if (!job) return;
+      const applied = hasApplied(job.id, currentUser.id);
+      const saved   = isJobSaved(currentUser.id, job.id);
+      const avg     = getAverageRating(job.companyId);
+      const avgSalary = getSalaryInsight(job.title);
+      document.getElementById('jobDetailPanel').innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+          <a href="empresa-publica.html?id=${job.companyId}" onclick="event.stopPropagation()" style="text-decoration:none">
+            <div class="avatar avatar--company" style="width:52px;height:52px;font-size:16px;border-radius:12px;cursor:pointer" title="Ver perfil da empresa">${job.companyAvatar}</div>
+          </a>
+          <div style="flex:1">
+            <h2 style="font-size:18px;font-weight:700">${job.title}</h2>
+            <a href="empresa-publica.html?id=${job.companyId}" style="font-size:13px;color:var(--blue)">${job.companyName}</a>
+          </div>
+          ${job.featured ? '<span class="featured-badge">★ Destaque</span>' : ''}
+        </div>
+        <div class="meta" style="margin-bottom:12px">
+          <span class="meta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${job.location}</span>
+          <span class="meta-chip">${job.type}</span>
+          ${job.experience ? `<span class="meta-chip">${job.experience}</span>` : ''}
+          <span class="meta-chip">Publicado ${daysAgo(job.posted)}</span>
+        </div>
+        ${avg ? `<div style="display:flex;align-items:center;gap:6px;margin-bottom:12px"><div class="stars-row">${starsHTML(avg,false,'')}</div><span class="rating-num">${avg}</span><a href="empresa-publica.html?id=${job.companyId}#reviews" style="font-size:12px;color:var(--blue);margin-left:4px">Ver avaliações</a></div>` : ''}
+        <div style="font-size:22px;font-weight:700;color:var(--blue-deep);margin-bottom:8px">${job.salary}</div>
+        ${avgSalary ? `<div class="salary-insight">💡 Salário médio para <strong>${job.title}</strong> no Portal Carreiras: <strong>${avgSalary}</strong></div>` : ''}
+        <div class="divider"></div>
+        <div style="font-size:14px;color:var(--dark-2);line-height:1.75;white-space:pre-line;margin:16px 0">${job.description}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px">${job.tags.map(t => `<span style="font-size:12px;padding:4px 12px;border-radius:20px;background:var(--blue-light);color:var(--blue);font-weight:500">${t}</span>`).join('')}</div>
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <div class="share-row">
+            <button class="share-btn" onclick="copyJobLink('${job.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copiar link</button>
+            <button class="share-btn" onclick="shareWhatsApp('${job.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>WhatsApp</button>
+            <button class="share-btn" onclick="toggleSave('${job.id}')" id="saveBtn_${job.id}" style="color:${saved?'var(--gold-light)':'inherit'}">${saved ? '♥ Guardado' : '♡ Guardar'}</button>
+          </div>
+        </div>
+        ${applied
+          ? `<div class="alert alert--success">✓ Candidatou-se a esta vaga. Ver estado em <strong>Candidaturas</strong>.</div>`
+          : `<button class="btn btn--primary btn--full" onclick="openApplyModal('${job.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>Candidatar-me</button>`
+        }`;
+    }
+
+    function getSalaryInsight(title) {
+      const jobs = getJobs().filter(j => j.title.toLowerCase().includes(title.split(' ')[0].toLowerCase()) && j.salaryMin && j.salaryMax);
+      if (jobs.length < 2) return null;
+      const avg = Math.round(jobs.reduce((s, j) => s + (j.salaryMin + j.salaryMax) / 2, 0) / jobs.length);
+      return avg.toLocaleString('pt-PT') + ' €/mês (média)';
+    }
+
+    function toggleSave(jobId) {
+      const isSaved = toggleSaveJob(currentUser.id, jobId);
+      showToast(isSaved ? 'Vaga guardada!' : 'Vaga removida dos guardados.', isSaved ? 'success' : 'info');
+      updateCounts();
+      if (selectedJobId === jobId) selectJob(jobId);
+      else renderJobs();
+    }
+    function copyJobLink(jobId) { navigator.clipboard.writeText(`http://localhost:3000/empresa-publica.html?id=${getJobById(jobId)?.companyId}`).then(() => showToast('Link copiado!', 'success')); }
+    function shareWhatsApp(jobId) { const j = getJobById(jobId); window.open(`https://wa.me/?text=${encodeURIComponent(j.title + ' @ ' + j.companyName + ' — ' + j.salary)}`,'_blank'); }
+
+    /* ---- GUARDADAS ---- */
+    function renderSaved() {
+      const jobs = getSavedJobsForUser(currentUser.id);
+      const list = document.getElementById('savedList');
+      if (!jobs.length) { list.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><h3>Nenhuma vaga guardada</h3><p>Clique em ♥ numa vaga para a guardar.</p></div>`; return; }
+      list.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px">${jobs.map(j => jobCard(j, false)).join('')}</div>`;
+    }
+
+    /* ---- RECOMENDADAS ---- */
+    function renderRecommended() {
+      const jobs = getRecommendedJobs(currentUser.id);
+      const grid = document.getElementById('recommendedGrid');
+      const banner = document.getElementById('notifBanner');
+      const u = getUserById(currentUser.id);
+      if (!u.skills || !u.skills.length) {
+        banner.innerHTML = `<div class="notif-banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Adicione competências ao seu perfil para obter recomendações personalizadas.</p><button onclick="showPage('perfil')">Completar Perfil</button></div>`;
+      } else { banner.innerHTML = ''; }
+      if (!jobs.length) { grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><h3>Nenhuma recomendação</h3><p>Actualize o seu perfil com mais competências.</p></div>`; return; }
+      grid.innerHTML = jobs.map(j => jobCard(j, false)).join('');
+    }
+
+    /* ---- APPLY MODAL ---- */
+    function openApplyModal(jobId) {
+      const job = getJobById(jobId);
+      const hasQ = job.screeningQuestions && job.screeningQuestions.length > 0;
+      const content = document.getElementById('applyModalContent');
+      content.innerHTML = `
+        <h3 style="font-size:18px;font-weight:700;margin-bottom:4px">Candidatar-me a</h3>
+        <p style="font-size:14px;color:var(--gray);margin-bottom:20px">${job.title} · ${job.companyName}</p>
+        ${hasQ ? `<div class="screening-card"><h4>Perguntas de triagem</h4>${job.screeningQuestions.map(q => `
+          <div class="screening-q">
+            <label>${q.question}</label>
+            ${q.type === 'yesno'
+              ? `<div class="screening-q-yesno"><label><input type="radio" name="sq_${q.id}" value="Sim"> Sim</label><label><input type="radio" name="sq_${q.id}" value="Não"> Não</label></div>`
+              : `<input type="text" class="screening-q-answer" id="sq_${q.id}" placeholder="A sua resposta..." />`}
+          </div>`).join('')}</div>` : '<div class="alert alert--info" style="margin-bottom:20px">✓ Não há perguntas de triagem para esta vaga. A sua candidatura será enviada directamente.</div>'}
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <button class="btn btn--ghost" onclick="closeApplyModal()">Cancelar</button>
+          <button class="btn btn--primary" onclick="submitApply('${jobId}')">Enviar Candidatura</button>
+        </div>`;
+      document.getElementById('applyModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeApplyModal() { document.getElementById('applyModal').classList.remove('active'); document.body.style.overflow = ''; }
+    function submitApply(jobId) {
+      const job = getJobById(jobId);
+      const answers = {};
+      if (job.screeningQuestions) {
+        job.screeningQuestions.forEach(q => {
+          if (q.type === 'yesno') {
+            const sel = document.querySelector(`input[name="sq_${q.id}"]:checked`);
+            answers[q.id] = sel ? sel.value : '';
+          } else {
+            const el = document.getElementById('sq_' + q.id);
+            answers[q.id] = el ? el.value.trim() : '';
+          }
+        });
+      }
+      const result = applyToJob(jobId, currentUser.id, answers);
+      if (result.error) { showToast(result.error, 'error'); return; }
+      closeApplyModal();
+      showToast('Candidatura enviada com sucesso!', 'success');
+      updateCounts();
+      selectJob(jobId);
+    }
+
+    /* ---- CANDIDATURAS ---- */
+    function renderApplications() {
+      const fs = document.getElementById('filterStatus').value;
+      let apps = getApplicationsByUser(currentUser.id);
+      if (fs) apps = apps.filter(a => a.status === fs);
+      apps.sort((a, b) => new Date(b.appliedAt) - new Date(a.appliedAt));
+      const list = document.getElementById('applicationsList');
+      if (!apps.length) { list.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><h3>${fs ? 'Nenhuma candidatura neste estado' : 'Ainda sem candidaturas'}</h3><p>${fs ? 'Tente outro filtro.' : 'Pesquise e candidate-se a vagas!'}</p>${!fs ? `<button class="btn btn--primary" style="margin-top:16px" onclick="showPage('pesquisar')">Pesquisar Vagas</button>` : ''}</div>`; return; }
+      list.innerHTML = apps.map(app => {
+        const job = getJobById(app.jobId);
+        if (!job) return '';
+        const interview = getInterviewByApp(app.id);
+        const unread = getMessagesByApp(app.id).filter(m => !m.read && m.senderType !== 'colaborador').length;
+        const isClosed = job.status === 'closed';
+
+        const closedBanner = isClosed ? `<div class="job-closed-banner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span>Esta vaga foi <strong>encerrada</strong> pela empresa — não haverá mais actualizações.</span>
+        </div>` : '';
+
+        const interviewNote = isClosed && interview ? `<div style="font-size:12px;color:var(--gray);margin-top:4px;padding:6px 10px;background:var(--gray-light);border-radius:6px">⚠️ A entrevista abaixo foi agendada mas a vaga foi entretanto encerrada.</div>` : '';
+
+        return `<div class="app-card ${isClosed ? 'app-card--closed' : ''}" style="flex-wrap:wrap;gap:14px">
+          ${closedBanner}
+          <div class="avatar avatar--company" style="width:44px;height:44px;font-size:13px;border-radius:10px;opacity:${isClosed ? '.55' : '1'}">${job.companyAvatar}</div>
+          <div class="app-card__info" style="flex:1;min-width:200px">
+            <div class="app-card__title" style="${isClosed ? 'color:var(--gray)' : ''}">${job.title} ${isClosed ? '<span class="job-closed-tag">Encerrada</span>' : ''}</div>
+            <div class="app-card__company">${job.companyName} · ${job.location}</div>
+            <div class="app-card__meta"><span>📅 ${formatDate(app.appliedAt)}</span><span>💰 ${job.salary}</span></div>
+            ${app.note ? `<div class="app-card__note" style="margin-top:4px">"${app.note}"</div>` : ''}
+            ${interviewNote}
+            ${interview ? `<div class="interview-card" style="margin-top:10px">
+              <div class="interview-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+              <div class="interview-card__info">
+                <div class="interview-card__title">Entrevista: ${interview.proposedDate} às ${interview.time}</div>
+                <div class="interview-card__meta">${interview.format} · ${interview.location}</div>
+              </div>
+              <div class="interview-card__actions">
+                <span class="status-badge status-badge--interview-${interview.status}">${interview.status === 'pendente' ? '⏳ Pendente' : interview.status === 'confirmado' ? '✓ Confirmado' : '✗ Cancelado'}</span>
+                ${interview.status === 'pendente' && !isClosed ? `<button class="btn btn--success btn--sm" onclick="confirmMyInterview('${app.id}',true)">Confirmar</button><button class="btn btn--danger btn--sm" onclick="confirmMyInterview('${app.id}',false)">Recusar</button>` : ''}
+              </div>
+            </div>` : ''}
+          </div>
+          <div class="app-card__actions" style="flex-direction:column;align-items:flex-end;gap:8px">
+            ${statusBadge(app.status)}
+            <div style="display:flex;gap:6px">
+              <button class="btn btn--ghost btn--sm" onclick="openMsgThreadFromApp('${app.id}')">
+                💬 Mensagens ${unread ? `<span class="unread-dot"></span>` : ''}
+              </button>
+              ${!isClosed ? `<button class="btn btn--ghost btn--sm" onclick="goToJob('${job.id}')">Ver Vaga</button>` : ''}
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function confirmMyInterview(appId, confirm) {
+      confirmInterview(appId, confirm);
+      showToast(confirm ? 'Entrevista confirmada!' : 'Entrevista recusada.', confirm ? 'success' : 'info');
+      renderApplications();
+    }
+    function goToJob(jobId) { selectedJobId = jobId; showPage('pesquisar'); setTimeout(() => selectJob(jobId), 60); }
+
+    /* ---- MESSAGES ---- */
+    function renderMessages() {
+      const apps = getApplicationsByUser(currentUser.id);
+      const list = document.getElementById('msgThreadList');
+      if (!apps.length) { list.innerHTML = `<div style="padding:20px;text-align:center;font-size:13px;color:var(--gray)">Sem conversas ainda.</div>`; return; }
+      list.innerHTML = apps.map(app => {
+        const job  = getJobById(app.jobId);
+        const msgs = getMessagesByApp(app.id);
+        const last = msgs[msgs.length - 1];
+        const unread = msgs.filter(m => !m.read && m.senderType !== 'colaborador').length;
+        return `<div onclick="openMsgThread('${app.id}')" style="padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--border);background:${activeThread===app.id?'var(--blue-pale)':'white'};transition:var(--transition)"
+          onmouseover="this.style.background='var(--gray-light)'" onmouseout="this.style.background='${activeThread===app.id?'var(--blue-pale)':'white'}'">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <div class="avatar avatar--company" style="width:32px;height:32px;font-size:11px;border-radius:8px">${job?.companyAvatar||'?'}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:${unread?'700':'500'};color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${job?.companyName||'—'}</div>
+              <div style="font-size:11px;color:var(--gray);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${job?.title||''}</div>
+            </div>
+            ${unread ? `<span class="badge-count" style="background:var(--red)">${unread}</span>` : ''}
+          </div>
+          ${last ? `<div style="font-size:12px;color:var(--gray);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${last.content}</div>` : ''}
+        </div>`;
+      }).join('');
+    }
+
+    function openMsgThread(appId) {
+      activeThread = appId;
+      markMessagesRead(appId, 'colaborador');
+      updateCounts();
+      renderMessages();
+      const app = getApplicationById(appId);
+      const job = getJobById(app?.jobId);
+      const msgs = getMessagesByApp(appId);
+      const panel = document.getElementById('msgPanel');
+      panel.innerHTML = `
+        <div style="padding:14px 18px;border-bottom:1px solid var(--border);font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px">
+          <div class="avatar avatar--company" style="width:28px;height:28px;font-size:10px;border-radius:6px">${job?.companyAvatar||'?'}</div>
+          ${job?.companyName||'—'} <span style="font-size:12px;color:var(--gray);font-weight:400">— ${job?.title||''}</span>
+        </div>
+        <div class="chat-container" id="chatMsgs">
+          ${msgs.length ? msgs.map(m => {
+            const isOut = m.senderType === 'colaborador';
+            return `<div style="display:flex;flex-direction:column;align-items:${isOut?'flex-end':'flex-start'}">
+              <div class="chat-bubble chat-bubble--${isOut?'out':'in'}">${m.content}
+                <div class="chat-bubble__meta">${formatDateTime(m.date)}</div>
+              </div>
+            </div>`;
+          }).join('') : '<div class="chat-empty">Sem mensagens ainda. Inicie a conversa!</div>'}
+        </div>
+        <div class="chat-input-row" style="padding:12px 16px">
+          <input type="text" id="msgInput" placeholder="Escreva uma mensagem..." onkeydown="if(event.key==='Enter')sendMsg('${appId}')" />
+          <button class="btn btn--primary" onclick="sendMsg('${appId}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg></button>
+        </div>`;
+      const chatEl = document.getElementById('chatMsgs');
+      if (chatEl) chatEl.scrollTop = chatEl.scrollHeight;
+    }
+
+    function sendMsg(appId) {
+      const input = document.getElementById('msgInput');
+      const content = input.value.trim();
+      if (!content) return;
+      sendMessage(appId, currentUser.id, 'colaborador', content);
+      input.value = '';
+      openMsgThread(appId);
+    }
+
+    function openMsgThreadFromApp(appId) { showPage('mensagens'); setTimeout(() => openMsgThread(appId), 60); }
+
+    /* ---- ALERTS ---- */
+    function renderAlerts() {
+      const alerts = getAlertsForUser(currentUser.id);
+      const list = document.getElementById('alertsList');
+      if (!alerts.length) { list.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg><h3>Sem alertas activos</h3><p>Crie um alerta para ser notificado de novas vagas.</p></div>`; return; }
+      list.innerHTML = alerts.map(a => `
+        <div class="alert-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;color:var(--blue);flex-shrink:0"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <div class="alert-item__info">
+            <div class="alert-item__query">${a.query || 'Todas as vagas'} ${a.location ? '· ' + a.location : ''}</div>
+            <div class="alert-item__meta">Criado em ${formatDate(a.createdAt)}</div>
+          </div>
+          <span class="alert-item__freq">${a.frequency}</span>
+          <button class="btn btn--danger btn--sm" onclick="removeAlert('${a.id}')">Remover</button>
+        </div>`).join('');
+    }
+    function createNewAlert() {
+      const q = document.getElementById('alertQuery').value.trim();
+      const l = document.getElementById('alertLocation').value.trim();
+      const f = document.getElementById('alertFreq').value;
+      if (!q) { showToast('Escreva palavras-chave para o alerta.', 'error'); return; }
+      createAlert(currentUser.id, q, l, f);
+      document.getElementById('alertQuery').value = '';
+      document.getElementById('alertLocation').value = '';
+      showToast('Alerta criado!', 'success');
+      renderAlerts();
+    }
+    function removeAlert(id) { deleteAlert(id); showToast('Alerta removido.', 'info'); renderAlerts(); }
+
+    /* ---- PROFILE ---- */
+    function initProfilePage() {
+      currentUser = getUserById(currentUser.id) || currentUser;
+      updateSidebar(); loadPersonalInfo(); loadSkills(); loadExperience(); loadEducation(); renderCVSection(); updateProfileProgress();
+    }
+    function updateSidebar() {
+      document.getElementById('sidebarAvatar').textContent = currentUser.avatar || '';
+      document.getElementById('sidebarName').textContent   = (currentUser.name||'') + ' ' + (currentUser.surname||'');
+      document.getElementById('sidebarRole').textContent   = currentUser.role || 'Sem cargo definido';
+    }
+    function showProfileSection(sec) {
+      document.querySelectorAll('.profile-subpage').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.profile-nav-item').forEach(i => i.classList.remove('active'));
+      document.getElementById('section' + sec[0].toUpperCase() + sec.slice(1)).classList.add('active');
+      document.getElementById('pnav' + sec[0].toUpperCase() + sec.slice(1)).classList.add('active');
+    }
+    function updateAboutCount() { document.getElementById('aboutCount').textContent = (document.getElementById('piAbout').value||'').length; }
+    function savePersonalInfo(e) {
+      e.preventDefault();
+      const updates = {
+        name:              document.getElementById('piName').value.trim(),
+        surname:           document.getElementById('piSurname').value.trim(),
+        role:              document.getElementById('piRole').value.trim(),
+        location:          document.getElementById('piLocation').value.trim(),
+        phone:             document.getElementById('piPhone').value.trim(),
+        email:             document.getElementById('piEmail').value.trim(),
+        about:             document.getElementById('piAbout').value.trim(),
+        availability:      document.getElementById('piAvailability').value,
+        profileVisibility: document.getElementById('piVisibility').value,
+      };
+      updates.avatar = (updates.name[0]||'') + (updates.surname[0]||'');
+      currentUser = updateUserProfile(currentUser.id, updates);
+      document.getElementById('userAvatar').textContent = currentUser.avatar;
+      document.getElementById('userName').textContent   = currentUser.name + ' ' + currentUser.surname;
+      updateSidebar(); updateProfileProgress();
+      showToast('Informação pessoal guardada!', 'success');
+    }
+    function loadSkills()    { currentSkills = [...(currentUser.skills||[])]; renderSkillTags(); }
+    function renderSkillTags(){ document.getElementById('skillsTags').innerHTML = currentSkills.map((s,i) => `<span class="skill-tag-edit">${s}<button onclick="removeSkill(${i})">×</button></span>`).join(''); }
+    function addSkill() { const v = document.getElementById('skillInput').value.trim(); if (!v) return; v.split(',').map(s=>s.trim()).filter(s=>s&&!currentSkills.includes(s)).forEach(s=>currentSkills.push(s)); document.getElementById('skillInput').value=''; renderSkillTags(); }
+    function removeSkill(i)  { currentSkills.splice(i,1); renderSkillTags(); }
+    function saveSkills()    { currentUser = updateUserProfile(currentUser.id,{skills:currentSkills}); updateProfileProgress(); showToast('Competências guardadas!','success'); }
+    function loadExperience(){ currentExp = (currentUser.experience||[]).map(e=>({...e})); renderExpEntries(); }
+    function renderExpEntries() {
+      const c = document.getElementById('expEntries');
+      if (!currentExp.length) { c.innerHTML = `<div style="text-align:center;padding:20px;color:var(--gray);font-size:13px">Sem experiências. Clique em "+ Adicionar".</div>`; return; }
+      c.innerHTML = currentExp.map((exp,i) => `<div class="exp-entry"><button class="exp-entry__remove" onclick="removeExp(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+        <div class="form-group form-group--half" style="margin-bottom:10px"><div><label>Cargo</label><input type="text" value="${exp.role||''}" oninput="currentExp[${i}].role=this.value" placeholder="ex: Engenheiro"/></div><div><label>Empresa</label><input type="text" value="${exp.company||''}" oninput="currentExp[${i}].company=this.value" placeholder="ex: TechStart"/></div></div>
+        <div class="form-group" style="margin-bottom:10px"><label>Período</label><input type="text" value="${exp.period||''}" oninput="currentExp[${i}].period=this.value" placeholder="ex: 2021 – Presente"/></div>
+        <div class="form-group" style="margin-bottom:0"><label>Descrição</label><textarea rows="2" oninput="currentExp[${i}].desc=this.value" placeholder="Responsabilidades e conquistas...">${exp.desc||''}</textarea></div></div>`).join('');
+    }
+    function addExpEntry()   { currentExp.push({role:'',company:'',period:'',desc:''}); renderExpEntries(); }
+    function removeExp(i)    { currentExp.splice(i,1); renderExpEntries(); }
+    function saveExperience(){ currentUser = updateUserProfile(currentUser.id,{experience:currentExp}); updateProfileProgress(); showToast('Experiência guardada!','success'); }
+    function loadEducation() { currentEdu = (currentUser.education||[]).map(e=>({...e})); renderEduEntries(); }
+    function renderEduEntries() {
+      const c = document.getElementById('eduEntries');
+      if (!currentEdu.length) { c.innerHTML = `<div style="text-align:center;padding:20px;color:var(--gray);font-size:13px">Sem educação. Clique em "+ Adicionar".</div>`; return; }
+      c.innerHTML = currentEdu.map((edu,i) => `<div class="exp-entry"><button class="exp-entry__remove" onclick="removeEdu(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+        <div class="form-group form-group--half" style="margin-bottom:10px"><div><label>Grau / Curso</label><input type="text" value="${edu.degree||''}" oninput="currentEdu[${i}].degree=this.value"/></div><div><label>Ano</label><input type="text" value="${edu.year||''}" oninput="currentEdu[${i}].year=this.value" placeholder="ex: 2022"/></div></div>
+        <div class="form-group" style="margin-bottom:0"><label>Instituição</label><input type="text" value="${edu.school||''}" oninput="currentEdu[${i}].school=this.value" placeholder="ex: IST"/></div></div>`).join('');
+    }
+    function addEduEntry()   { currentEdu.push({degree:'',school:'',year:''}); renderEduEntries(); }
+    function removeEdu(i)    { currentEdu.splice(i,1); renderEduEntries(); }
+    function saveEducation() { currentUser = updateUserProfile(currentUser.id,{education:currentEdu}); updateProfileProgress(); showToast('Educação guardada!','success'); }
+    function renderCVSection() {
+      const cv = getCV(currentUser.id);
+      document.getElementById('cvDropZone').classList.toggle('hidden', !!cv);
+      document.getElementById('cvUploadedState').classList.toggle('hidden', !cv);
+      if (cv) { document.getElementById('cvFileName').textContent = cv.name; document.getElementById('cvFileMeta').textContent = `${(cv.size/1024).toFixed(0)} KB · ${formatDate(cv.uploadedAt)}`; }
+    }
+    function triggerCVPicker() { document.getElementById('cvFileInput').click(); }
+    function handleCVFile(file) {
+      if (!file) return;
+      if (file.size > 5*1024*1024) { showToast('Máximo 5 MB.','error'); return; }
+      const allowed=['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowed.includes(file.type)) { showToast('Use PDF, DOC ou DOCX.','error'); return; }
+      const reader = new FileReader();
+      reader.onload = e => { saveCV(currentUser.id,{name:file.name,dataUrl:e.target.result,size:file.size,uploadedAt:new Date().toISOString().slice(0,10)}); renderCVSection(); updateProfileProgress(); showToast('CV carregado!','success'); };
+      reader.readAsDataURL(file);
+    }
+    function downloadCV() { const cv=getCV(currentUser.id); if(!cv)return; const a=document.createElement('a');a.href=cv.dataUrl;a.download=cv.name;a.click(); }
+    function removeCVFile() { if(!confirm('Remover CV?'))return; deleteCV(currentUser.id); document.getElementById('cvFileInput').value=''; renderCVSection(); updateProfileProgress(); showToast('CV removido.','info'); }
+    function handleDragOver(e) { e.preventDefault(); document.getElementById('cvDropZone').classList.add('drag-over'); }
+    function handleDragLeave() { document.getElementById('cvDropZone').classList.remove('drag-over'); }
+    function handleDrop(e) { e.preventDefault(); document.getElementById('cvDropZone').classList.remove('drag-over'); handleCVFile(e.dataTransfer.files[0]); }
+    function updateProfileProgress() {
+      const u = getUserById(currentUser.id)||currentUser;
+      let s=0;
+      if(u.name&&u.surname)s+=15; if(u.role)s+=15; if(u.about)s+=20; if(u.location)s+=10;
+      if(u.skills&&u.skills.length>=3)s+=15; if(u.experience&&u.experience.length>0)s+=15;
+      if(u.education&&u.education.length>0)s+=5; if(getCV(u.id))s+=5;
+      const pct=Math.min(s,100);
+      document.getElementById('profileProgress').style.width=pct+'%';
+      document.getElementById('profileProgressLabel').textContent=pct+'%';
+    }
+
+    /* ---- HIDE JOB ---- */
+    function doHideJob(jobId) {
+      hideJob(currentUser.id, jobId);
+      showToast('Vaga ocultada. Não a verá mais nos resultados.', 'info');
+      if (selectedJobId === jobId) {
+        selectedJobId = null;
+        document.getElementById('jobDetailPanel').innerHTML = `<div class="no-detail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg><p>Seleccione uma vaga para ver os detalhes</p></div>`;
+      }
+      renderJobs();
+    }
+
+    /* ---- COMPARE ---- */
+    function toggleCompare(jobId) {
+      if (compareIds.includes(jobId)) {
+        compareIds = compareIds.filter(id => id !== jobId);
+      } else {
+        if (compareIds.length >= 3) { showToast('Pode comparar no máximo 3 vagas.', 'error'); return; }
+        compareIds.push(jobId);
+      }
+      renderCompareBar();
+      renderJobs();
+    }
+    function renderCompareBar() {
+      const bar  = document.getElementById('compareBar');
+      const tags = document.getElementById('compareJobTags');
+      if (!compareIds.length) { bar.classList.remove('visible'); return; }
+      bar.classList.add('visible');
+      tags.innerHTML = compareIds.map(id => {
+        const j = getJobById(id);
+        return j ? `<div class="compare-bar__job-tag">${j.title} <button onclick="toggleCompare('${id}')">×</button></div>` : '';
+      }).join('');
+    }
+    function clearCompare() { compareIds = []; renderCompareBar(); renderJobs(); }
+    function openCompareModal() {
+      if (compareIds.length < 2) { showToast('Seleccione pelo menos 2 vagas para comparar.', 'error'); return; }
+      const jobs = compareIds.map(id => getJobById(id)).filter(Boolean);
+      const rows = [
+        ['Empresa',      j => j.companyName],
+        ['Localização',  j => j.location],
+        ['Tipo',         j => j.type],
+        ['Experiência',  j => j.experience || '—'],
+        ['Salário',      j => j.salary || '—'],
+        ['Destaque',     j => j.featured ? '⭐ Sim' : 'Não'],
+        ['Avaliação',    j => { const a = getAverageRating(j.companyId); return a ? `${a} ★` : '—'; }],
+        ['Publicado',    j => formatDate(j.posted)],
+        ['Competências', j => (j.tags || []).join(', ') || '—'],
+      ];
+      document.getElementById('compareTableWrap').innerHTML = `
+        <table class="compare-table">
+          <thead><tr>
+            <th>Campo</th>
+            ${jobs.map(j => `<th class="job-col">${j.title}</th>`).join('')}
+          </tr></thead>
+          <tbody>
+            ${rows.map(([label, fn]) => `<tr>
+              <td style="font-weight:600;color:var(--dark);white-space:nowrap">${label}</td>
+              ${jobs.map(j => `<td>${fn(j)}</td>`).join('')}
+            </tr>`).join('')}
+            <tr>
+              <td></td>
+              ${jobs.map(j => `<td>${hasApplied(j.id, currentUser.id)
+                ? '<span class="status-badge status--accepted">✓ Candidatado</span>'
+                : `<button class="btn btn--primary btn--sm" onclick="closeCompareModal();selectJob('${j.id}')">Ver Vaga</button>`
+              }</td>`).join('')}
+            </tr>
+          </tbody>
+        </table>`;
+      document.getElementById('compareModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeCompareModal() { document.getElementById('compareModal').classList.remove('active'); document.body.style.overflow = ''; }
+
+    /* ---- EVENTOS ---- */
+    function renderEventos() {
+      const events = getUpcomingEvents();
+      const list   = document.getElementById('eventosList');
+      if (!events.length) {
+        list.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><h3>Sem eventos agendados</h3><p>Fique atento a novos eventos de recrutamento.</p></div>`;
+        return;
+      }
+      list.innerHTML = events.map(ev => {
+        const d = new Date(ev.date);
+        const registered = isRegisteredForEvent(ev.id, currentUser.id);
+        const company = getUserById(ev.companyId);
+        return `<div class="event-card">
+          <div class="event-card__date-box">
+            <div class="event-card__day">${d.getDate().toString().padStart(2,'0')}</div>
+            <div class="event-card__month">${d.toLocaleDateString('pt-PT',{month:'short'})}</div>
+          </div>
+          <div class="event-card__info">
+            <div class="event-card__title">${ev.title}</div>
+            <div class="event-card__meta">
+              <span>🏢 ${company ? company.companyName : 'Empresa'}</span>
+              <span>🕐 ${ev.time}</span>
+              <span>📍 ${ev.location}</span>
+              <span>💻 ${ev.format}</span>
+              <span>👥 ${(ev.registrations||[]).length} inscritos</span>
+            </div>
+            <div class="event-card__desc">${ev.description}</div>
+          </div>
+          <div class="event-card__actions">
+            ${registered
+              ? `<span class="status-badge status--accepted">✓ Inscrito</span>
+                 <button class="btn btn--ghost btn--sm" onclick="doUnregisterEvent('${ev.id}')">Cancelar inscrição</button>`
+              : `<button class="btn btn--primary btn--sm" onclick="doRegisterEvent('${ev.id}')">Inscrever-me</button>`}
+          </div>
+        </div>`;
+      }).join('');
+    }
+    function doRegisterEvent(evId) {
+      registerForEvent(evId, currentUser.id);
+      addNotification(currentUser.id, 'alert', 'Inscrição confirmada!', 'Ficou inscrito num evento de recrutamento.', 'colaborador.html');
+      showToast('Inscrição confirmada!', 'success');
+      updateNotifBell();
+      renderEventos();
+    }
+    function doUnregisterEvent(evId) {
+      unregisterFromEvent(evId, currentUser.id);
+      showToast('Inscrição cancelada.', 'info');
+      renderEventos();
+    }
+
+    /* ---- TESTES DE COMPETÊNCIAS ---- */
+    function renderTestes() {
+      const tests     = getAvailableTests();
+      const completed = getCompletedTestsForUser(currentUser.id);
+      const banner    = document.getElementById('testCompletedBanner');
+      const passed    = completed.filter(t => {
+        const def = tests.find(tt => tt.id === t.testId);
+        return def && t.score >= def.passingScore;
+      });
+      banner.innerHTML = passed.length
+        ? `<div class="alert alert--success" style="margin-bottom:0">✓ Tem <strong>${passed.length}</strong> certificação${passed.length !== 1 ? 'ões' : ''} aprovada${passed.length !== 1 ? 's' : ''}. Visível no seu perfil público.</div>`
+        : '';
+      document.getElementById('testsList').innerHTML = tests.map(t => {
+        const result = completed.find(c => c.testId === t.id);
+        const passed = result && result.score >= t.passingScore;
+        return `<div class="test-card">
+          <div class="test-card__header">
+            <div class="test-card__name">${t.name}</div>
+            <span class="test-card__cat">${t.category}</span>
+          </div>
+          <div class="test-card__meta">
+            <span>⏱ ${t.duration} min</span>
+            <span>📝 ${t.questions} questões</span>
+            <span>Aprovação: ${t.passingScore}%</span>
+          </div>
+          ${result ? `
+          <div class="test-card__result">
+            <div class="test-score-bar"><div class="test-score-fill ${passed ? 'test-score-fill--pass' : 'test-score-fill--fail'}" style="width:${result.score}%"></div></div>
+            <span class="test-score-val" style="color:${passed ? 'var(--green)' : 'var(--red)'}">${result.score}%</span>
+          </div>
+          <span class="test-badge ${passed ? 'test-badge--pass' : 'test-badge--fail'}">${passed ? '✓ Aprovado' : '✗ Reprovado'}</span>
+          <button class="btn btn--ghost btn--sm" style="margin-top:10px;width:100%" onclick="startTest('${t.id}')">Repetir teste</button>
+          ` : `<button class="btn btn--primary btn--sm" style="margin-top:8px;width:100%" onclick="startTest('${t.id}')">Iniciar teste</button>`}
+        </div>`;
+      }).join('');
+    }
+    function startTest(testId) {
+      const t = getAvailableTests().find(tt => tt.id === testId);
+      if (!t) return;
+      document.getElementById('testModalContent').innerHTML = `
+        <h3 style="font-size:18px;font-weight:700;margin-bottom:4px">${t.name}</h3>
+        <p style="font-size:13px;color:var(--gray);margin-bottom:20px">${t.questions} questões · ${t.duration} minutos · Aprovação: ${t.passingScore}%</p>
+        <div style="background:var(--blue-pale);border:1px solid #bfdbfe;border-radius:var(--radius);padding:16px;margin-bottom:20px;font-size:14px;color:var(--dark-2);line-height:1.7">
+          Este é um teste demonstrativo. No portal real, seria composto por ${t.questions} questões de escolha múltipla sobre <strong>${t.name}</strong>.<br><br>
+          Clique em <strong>"Simular resultado"</strong> para gerar um resultado demonstrativo.
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <button class="btn btn--ghost" onclick="closeTestModal()">Cancelar</button>
+          <button class="btn btn--primary" onclick="simulateTest('${testId}')">Simular resultado</button>
+        </div>`;
+      document.getElementById('testModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function simulateTest(testId) {
+      const t     = getAvailableTests().find(tt => tt.id === testId);
+      const score = Math.floor(Math.random() * 35) + 60; // 60-94%
+      completeSkillTest(currentUser.id, testId, score);
+      closeTestModal();
+      const passed = score >= t.passingScore;
+      showToast(`${passed ? '✓ Aprovado' : '✗ Reprovado'} com ${score}%!`, passed ? 'success' : 'error');
+      renderTestes();
+    }
+    function closeTestModal() { document.getElementById('testModal').classList.remove('active'); document.body.style.overflow = ''; }
+
+    /* ---- SALARY CALCULATOR ---- */
+    function initSalaryRoles() {
+      const sel = document.getElementById('salRole');
+      if (!sel) return;
+      getAllSalaryRoles().forEach(r => {
+        const o = document.createElement('option'); o.value = r; o.textContent = r; sel.appendChild(o);
+      });
+    }
+    function calcSalary() {
+      const role     = document.getElementById('salRole').value;
+      const location = document.getElementById('salLocation').value;
+      const result   = document.getElementById('salResult');
+      if (!role) { showToast('Seleccione uma função.', 'error'); return; }
+      const data = getSalaryData(role, location || 'default');
+      if (!data) { result.style.display = 'block'; result.innerHTML = `<div class="alert alert--error">Sem dados suficientes para esta função.</div>`; return; }
+      const maxVal = Math.max(...data.senior);
+      const pct = v => ((v / maxVal) * 100).toFixed(0);
+      result.style.display = 'block';
+      result.innerHTML = `
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:4px">${role}</h3>
+        <p style="font-size:13px;color:var(--gray);margin-bottom:20px">${location || 'Portugal'} · Valores mensais brutos (€)</p>
+        <div class="salary-range">
+          <div class="salary-level salary-level--junior">
+            <div class="salary-level__label">Júnior</div>
+            <div class="salary-level__range">${data.junior[0].toLocaleString('pt-PT')} – ${data.junior[1].toLocaleString('pt-PT')} €</div>
+            <div class="salary-level__sub">0-2 anos</div>
+          </div>
+          <div class="salary-level salary-level--pleno">
+            <div class="salary-level__label">Pleno</div>
+            <div class="salary-level__range">${data.pleno[0].toLocaleString('pt-PT')} – ${data.pleno[1].toLocaleString('pt-PT')} €</div>
+            <div class="salary-level__sub">2-5 anos</div>
+          </div>
+          <div class="salary-level salary-level--senior">
+            <div class="salary-level__label">Sénior</div>
+            <div class="salary-level__range">${data.senior[0].toLocaleString('pt-PT')} – ${data.senior[1].toLocaleString('pt-PT')} €</div>
+            <div class="salary-level__sub">5+ anos</div>
+          </div>
+        </div>
+        <div class="salary-bar-section">
+          ${[['júnior','junior','salary-bar-fill--junior'],['pleno','pleno','salary-bar-fill--pleno'],['sénior','senior','salary-bar-fill--senior']].map(([label, key, cls]) => `
+          <div class="salary-bar-row">
+            <div class="salary-bar-label">${label.charAt(0).toUpperCase()+label.slice(1)}</div>
+            <div class="salary-bar-track"><div class="salary-bar-fill ${cls}" style="width:${pct(data[key][1])}%"></div></div>
+            <div class="salary-bar-val">${data[key][0].toLocaleString('pt-PT')} – ${data[key][1].toLocaleString('pt-PT')} €</div>
+          </div>`).join('')}
+        </div>`;
+      // Show matching jobs
+      const matchJobs = getJobs().filter(j => j.status === 'active' && j.salaryMin && j.title.toLowerCase().includes(role.split(' ')[0].toLowerCase()));
+      const jl = document.getElementById('salJobsList');
+      jl.innerHTML = matchJobs.length
+        ? matchJobs.slice(0,4).map(j => `<div class="job-card" onclick="selectedJobId='${j.id}';showPage('pesquisar');setTimeout(()=>selectJob('${j.id}'),60)" style="cursor:pointer;margin-bottom:10px">
+            <div class="job-card__top">
+              <div style="display:flex;align-items:center;gap:10px"><div class="job-card__logo">${j.companyAvatar}</div><div><div class="job-card__title">${j.title}</div><div class="job-card__company">${j.companyName} · ${j.location}</div></div></div>
+            </div>
+            <div class="job-card__footer"><span class="job-card__salary">${j.salary}</span><span style="color:var(--gray-2)">${daysAgo(j.posted)}</span></div>
+          </div>`).join('')
+        : '<div style="font-size:13px;color:var(--gray)">Sem vagas activas para esta função.</div>';
+    }
+    function renderSalarios() { /* page loaded on demand — init roles already done */ }
+
+    /* ---- PROFILE: availability + visibility save ---- */
+    function loadPersonalInfo() {
+      ['Name','Surname','Role','Location','Phone','Email','About'].forEach(f => {
+        const el = document.getElementById('pi' + f);
+        if (el) el.value = currentUser[f.toLowerCase()] || '';
+      });
+      const avEl = document.getElementById('piAvailability');
+      const viEl = document.getElementById('piVisibility');
+      if (avEl) avEl.value = currentUser.availability || 'active';
+      if (viEl) viEl.value = currentUser.profileVisibility || 'all';
+      updateAboutCount();
+    }
+
+    /* ---- TOAST ---- */
+    function showToast(msg, type) {
+      const c=document.getElementById('toastContainer'), t=document.createElement('div');
+      t.className=`toast toast--${type||'info'}`; t.textContent=msg; c.appendChild(t); setTimeout(()=>t.remove(),3500);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initUI(); renderJobs();
+      document.getElementById('piAbout').addEventListener('input', updateAboutCount);
+    });
+    document.addEventListener('keydown', e => { if(e.key==='Escape') { closeApplyModal(); closeCompareModal(); closeTestModal(); } });
+  </script>
+</body>
+</html>

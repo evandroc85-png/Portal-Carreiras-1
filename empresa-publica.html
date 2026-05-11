@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal Carreiras — Empresa</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    .pub-hero { background: linear-gradient(135deg, var(--blue-deep) 0%, var(--blue) 100%); min-height: 200px; position: relative; display: flex; align-items: flex-end; }
+    .pub-hero__inner { width: 100%; padding: 0 24px 0; max-width: 1120px; margin: 0 auto; }
+    .pub-hero__cover { position: absolute; inset: 0; opacity: .18; background-size: cover; background-position: center; }
+    .pub-company-bar { background: var(--white); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .pub-company-bar__inner { max-width: 1120px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; gap: 20px; min-height: 72px; }
+    .pub-avatar-wrap { margin-top: -32px; flex-shrink: 0; }
+    .pub-avatar { width: 72px; height: 72px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; color: white; border: 4px solid var(--white); box-shadow: var(--shadow-md); }
+    .pub-company-info { flex: 1; min-width: 0; }
+    .pub-company-info h1 { font-size: 20px; font-weight: 800; color: var(--dark); }
+    .pub-company-info .meta { font-size: 13px; color: var(--gray); display: flex; flex-wrap: wrap; gap: 12px; margin-top: 3px; }
+    .pub-tabs { display: flex; gap: 2px; border-bottom: none; }
+    .pub-tab { padding: 12px 18px; font-size: 14px; font-weight: 600; color: var(--gray); border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; transition: var(--transition); }
+    .pub-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+    .pub-tab:hover:not(.active) { color: var(--dark); background: var(--gray-light); }
+    .pub-content { max-width: 1120px; margin: 0 auto; padding: 32px 24px 60px; display: grid; grid-template-columns: 1fr 320px; gap: 28px; align-items: start; }
+    .pub-main { min-width: 0; }
+    .pub-side { display: flex; flex-direction: column; gap: 20px; }
+    .pub-tab-pane { display: none; }
+    .pub-tab-pane.active { display: block; }
+    .pub-section { margin-bottom: 28px; }
+    .pub-section h2 { font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+    .pub-job-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; margin-bottom: 12px; cursor: pointer; transition: var(--transition); display: flex; align-items: flex-start; gap: 14px; }
+    .pub-job-card:hover { border-color: var(--blue); box-shadow: var(--shadow); }
+    .pub-job-card__info { flex: 1; min-width: 0; }
+    .pub-job-card__title { font-size: 15px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .pub-job-card__meta { font-size: 12px; color: var(--gray); display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
+    .pub-job-card__tags { display: flex; flex-wrap: wrap; gap: 5px; }
+    .side-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; }
+    .side-card h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--gray); margin-bottom: 14px; }
+    .side-stat { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .side-stat:last-child { border-bottom: none; }
+    .side-stat__label { color: var(--gray); }
+    .side-stat__val { font-weight: 700; color: var(--dark); }
+    .benefit-tag { display: inline-block; font-size: 13px; color: var(--dark-2); padding: 6px 0; }
+    .benefit-tag::before { content: '✓ '; color: var(--green); font-weight: 700; }
+    .rating-overview { display: flex; align-items: center; gap: 20px; padding: 20px; background: var(--blue-pale); border-radius: var(--radius-lg); margin-bottom: 20px; }
+    .rating-big { font-size: 48px; font-weight: 800; color: var(--blue-deep); line-height: 1; }
+    .rating-bars { flex: 1; }
+    .rating-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 12px; }
+    .rating-bar-row__label { min-width: 40px; color: var(--gray); }
+    .rating-bar-row__track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .rating-bar-row__fill { height: 100%; border-radius: 4px; background: var(--gold-light); }
+    .rating-bar-row__count { min-width: 20px; text-align: right; color: var(--gray); }
+    .review-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 14px; }
+    .review-card__header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+    .review-card__title { font-size: 15px; font-weight: 700; color: var(--dark); }
+    .review-card__meta { font-size: 12px; color: var(--gray); margin-top: 2px; }
+    .review-card__body { font-size: 14px; color: var(--dark-2); line-height: 1.7; }
+    .review-form { background: var(--gray-light); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 24px; }
+    .review-form h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+    .stars-interactive { display: flex; gap: 4px; margin-bottom: 12px; }
+    .star-i { font-size: 28px; cursor: pointer; color: var(--border); transition: color .15s; }
+    .star-i.active { color: var(--gold-light); }
+    .int-review-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; margin-bottom: 12px; }
+    .int-review-card__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .int-review-card__title { font-size: 14px; font-weight: 700; color: var(--dark); }
+    .int-review-badge { font-size: 12px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+    .int-review-badge--offer  { background: #dcfce7; color: #15803d; }
+    .int-review-badge--nooffer { background: var(--gray-light); color: var(--gray); }
+    @media (max-width: 860px) {
+      .pub-content { grid-template-columns: 1fr; }
+      .pub-side { order: -1; }
+      .pub-company-bar__inner { flex-wrap: wrap; gap: 12px; }
+      .rating-overview { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body style="background:var(--gray-light)">
+
+  <!-- TOP NAVBAR -->
+  <header class="dash-navbar" style="position:sticky;top:0;z-index:200">
+    <div class="container">
+      <a href="index.html" class="navbar__logo"><img src="logo-icon.svg" alt="Portal Carreiras" /><div class="navbar__logo-text"><span>Portal</span><span>Carreiras</span></div></a>
+      <div style="display:flex;gap:10px;margin-left:auto">
+        <a href="colaborador.html" class="btn btn--ghost btn--sm" id="backBtn">← Voltar às vagas</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO COVER -->
+  <div class="pub-hero" id="pubHero" style="background:linear-gradient(135deg,#002d6e 0%,#0050c8 100%)">
+    <div class="pub-hero__cover" id="pubCover"></div>
+  </div>
+
+  <!-- COMPANY BAR -->
+  <div class="pub-company-bar">
+    <div class="pub-company-bar__inner">
+      <div class="pub-avatar-wrap">
+        <div class="pub-avatar" id="pubAvatar" style="background:var(--blue)">?</div>
+      </div>
+      <div class="pub-company-info">
+        <h1 id="pubName">—</h1>
+        <div class="meta" id="pubMeta"></div>
+      </div>
+      <div style="flex-shrink:0;display:flex;gap:10px;align-items:center">
+        <div id="pubRatingBadge"></div>
+        <button class="btn btn--primary btn--sm" id="followBtn" onclick="toggleFollow()">+ Seguir</button>
+      </div>
+    </div>
+    <div style="max-width:1120px;margin:0 auto;padding:0 24px">
+      <div class="pub-tabs">
+        <button class="pub-tab active" onclick="switchTab('sobre')" id="tabSobre">Sobre</button>
+        <button class="pub-tab" onclick="switchTab('vagas')" id="tabVagas">Vagas <span id="vagasCount" style="font-size:12px;color:var(--gray)"></span></button>
+        <button class="pub-tab" onclick="switchTab('avaliacoes')" id="tabAvaliacoes">Avaliações</button>
+        <button class="pub-tab" onclick="switchTab('entrevistas')" id="tabEntrevistas">Entrevistas</button>
+        <button class="pub-tab" onclick="switchTab('qa')" id="tabQa">P&amp;R</button>
+        <button class="pub-tab" onclick="switchTab('eventos')" id="tabEventos">Eventos</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="pub-content">
+    <div class="pub-main">
+
+      <!-- TAB: SOBRE -->
+      <div class="pub-tab-pane active" id="panesSobre">
+        <div class="pub-section">
+          <h2>Sobre a Empresa</h2>
+          <div id="pubAbout" style="font-size:14px;color:var(--dark-2);line-height:1.8"></div>
+        </div>
+        <div class="pub-section" id="cultureSec">
+          <h2>Cultura &amp; Valores</h2>
+          <div id="pubCulture" style="font-size:14px;color:var(--dark-2);line-height:1.8"></div>
+        </div>
+        <div class="pub-section" id="benefitsSec">
+          <h2>Benefícios</h2>
+          <div id="pubBenefits"></div>
+        </div>
+      </div>
+
+      <!-- TAB: VAGAS -->
+      <div class="pub-tab-pane" id="panesVagas">
+        <div class="pub-section">
+          <h2>Vagas em Aberto</h2>
+          <div id="pubVagas"></div>
+        </div>
+      </div>
+
+      <!-- TAB: AVALIAÇÕES -->
+      <div class="pub-tab-pane" id="panesAvaliacoes">
+        <div id="reviewOverview"></div>
+        <div id="reviewFormWrap"></div>
+        <div id="reviewsList"></div>
+      </div>
+
+      <!-- TAB: ENTREVISTAS -->
+      <div class="pub-tab-pane" id="panesEntrevistas">
+        <div id="intReviewOverview"></div>
+        <div id="intReviewFormWrap"></div>
+        <div id="intReviewsList"></div>
+      </div>
+
+      <!-- TAB: P&R -->
+      <div class="pub-tab-pane" id="panesQa">
+        <div class="pub-section">
+          <h2>Perguntas &amp; Respostas</h2>
+          <div id="qaFormWrap"></div>
+          <div id="qaList"></div>
+        </div>
+      </div>
+
+      <!-- TAB: EVENTOS -->
+      <div class="pub-tab-pane" id="panesEventos">
+        <div class="pub-section">
+          <h2>Eventos de Recrutamento</h2>
+          <div id="pubEventos"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="pub-side">
+      <div class="side-card">
+        <h3>Informação</h3>
+        <div id="sideInfo"></div>
+      </div>
+      <div class="side-card" id="sideStatsCard">
+        <h3>Estatísticas</h3>
+        <div id="sideStats"></div>
+      </div>
+      <div class="side-card">
+        <h3>Partilhar</h3>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn--ghost btn--sm" onclick="copyPageLink()" style="justify-content:flex-start">📋 Copiar link</button>
+          <button class="btn btn--ghost btn--sm" onclick="shareWhatsApp()" style="justify-content:flex-start">💬 Partilhar no WhatsApp</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="app-data.js"></script>
+  <script>
+    'use strict';
+
+    const params    = new URLSearchParams(location.search);
+    const companyId = params.get('id');
+    let company     = null;
+    let session     = getSession();
+    let reviewRating    = 0;
+    let intRevRating    = 0;
+
+    function init() {
+      if (!companyId) { document.body.innerHTML = '<div style="padding:60px;text-align:center;font-size:18px;color:var(--gray)">Empresa não encontrada.</div>'; return; }
+      company = getUserById(companyId);
+      if (!company) { document.body.innerHTML = '<div style="padding:60px;text-align:center;font-size:18px;color:var(--gray)">Empresa não encontrada.</div>'; return; }
+
+      // Hero colour
+      document.getElementById('pubHero').style.background = `linear-gradient(135deg, ${company.coverColor || '#002d6e'} 0%, ${company.coverColor ? company.coverColor + 'cc' : '#0050c8'} 100%)`;
+
+      // Avatar
+      const av = document.getElementById('pubAvatar');
+      av.textContent = company.avatar || (company.companyName||'?').slice(0,2).toUpperCase();
+      av.style.background = company.coverColor || 'var(--blue)';
+
+      // Name & meta
+      document.getElementById('pubName').textContent = company.companyName || '—';
+      const metaParts = [
+        company.sector   ? `🏭 ${company.sector}`   : null,
+        company.location ? `📍 ${company.location}` : null,
+        company.size     ? `👥 ${company.size}`      : null,
+        company.founded  ? `📅 Fundada em ${company.founded}` : null,
+        company.website  ? `🌐 <a href="https://${company.website}" target="_blank" style="color:var(--blue)">${company.website}</a>` : null,
+      ].filter(Boolean);
+      document.getElementById('pubMeta').innerHTML = metaParts.map(p => `<span>${p}</span>`).join('');
+
+      // Rating badge
+      const avgR = getAverageRating(companyId);
+      if (avgR) {
+        document.getElementById('pubRatingBadge').innerHTML = `<span style="display:flex;align-items:center;gap:5px;font-size:14px;font-weight:700;color:var(--dark)"><span style="color:var(--gold-light)">★</span>${avgR}</span>`;
+      }
+
+      document.title = `${company.companyName} — Portal Carreiras`;
+
+      // Sidebar info
+      const infoRows = [
+        ['Sector',    company.sector],
+        ['Dimensão',  company.size],
+        ['Localização', company.location],
+        ['Fundada',   company.founded],
+        ['Website',   company.website ? `<a href="https://${company.website}" target="_blank">${company.website}</a>` : null],
+      ].filter(r => r[1]);
+      document.getElementById('sideInfo').innerHTML = infoRows.map(([l,v]) => `<div class="side-stat"><span class="side-stat__label">${l}</span><span class="side-stat__val">${v}</span></div>`).join('');
+
+      // Sidebar stats
+      const myJobs = getJobsByCompany(companyId);
+      const allApps = myJobs.flatMap(j => getApplicationsByJob(j.id));
+      const reviews = getReviewsByCompany(companyId);
+      document.getElementById('sideStats').innerHTML = [
+        ['Vagas activas', myJobs.filter(j => j.status === 'active').length],
+        ['Avaliações',    reviews.length],
+        ['Nota média',    avgR ? `${avgR} / 5` : '—'],
+        ['Entrevistas avaliadas', getInterviewReviewsByCompany(companyId).length],
+      ].map(([l,v]) => `<div class="side-stat"><span class="side-stat__label">${l}</span><span class="side-stat__val">${v}</span></div>`).join('');
+
+      // Follow state
+      updateFollowBtn();
+
+      // Vaga count
+      document.getElementById('vagasCount').textContent = `(${myJobs.filter(j=>j.status==='active').length})`;
+
+      // Load default tab content
+      renderSobre();
+
+      // Hash navigation
+      if (location.hash === '#reviews' || location.hash === '#avaliacoes') switchTab('avaliacoes');
+      if (location.hash === '#qa') switchTab('qa');
+    }
+
+    /* ---- TABS ---- */
+    function switchTab(tab) {
+      document.querySelectorAll('.pub-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.pub-tab-pane').forEach(p => p.classList.remove('active'));
+      document.getElementById('tab' + tab[0].toUpperCase() + tab.slice(1)).classList.add('active');
+      document.getElementById('panes' + tab[0].toUpperCase() + tab.slice(1)).classList.add('active');
+      if (tab === 'sobre')       renderSobre();
+      if (tab === 'vagas')       renderVagas();
+      if (tab === 'avaliacoes')  renderAvaliacoes();
+      if (tab === 'entrevistas') renderEntrevistas();
+      if (tab === 'qa')          renderQA();
+      if (tab === 'eventos')     renderEventos();
+    }
+
+    /* ---- SOBRE ---- */
+    function renderSobre() {
+      document.getElementById('pubAbout').textContent = company.about || 'Sem descrição disponível.';
+      const cultureSec = document.getElementById('cultureSec');
+      const benefitsSec = document.getElementById('benefitsSec');
+      if (company.culture) {
+        document.getElementById('pubCulture').textContent = company.culture;
+        cultureSec.style.display = 'block';
+      } else { cultureSec.style.display = 'none'; }
+      if (company.benefits) {
+        document.getElementById('pubBenefits').innerHTML = company.benefits.split('·').map(b => b.trim()).filter(Boolean).map(b => `<div class="benefit-tag">${b}</div>`).join('');
+        benefitsSec.style.display = 'block';
+      } else { benefitsSec.style.display = 'none'; }
+    }
+
+    /* ---- VAGAS ---- */
+    function renderVagas() {
+      const jobs = getJobsByCompany(companyId).filter(j => j.status === 'active');
+      const el   = document.getElementById('pubVagas');
+      if (!jobs.length) { el.innerHTML = '<div style="font-size:14px;color:var(--gray);padding:20px 0">Sem vagas em aberto de momento.</div>'; return; }
+      el.innerHTML = jobs.map(j => {
+        incrementJobView(j.id);
+        return `<div class="pub-job-card" onclick="goToJob('${j.id}')">
+          <div style="flex-shrink:0">
+            ${j.featured ? '<span class="featured-badge">★ Destaque</span>' : ''}
+          </div>
+          <div class="pub-job-card__info">
+            <div class="pub-job-card__title">${j.title}</div>
+            <div class="pub-job-card__meta">
+              <span>📍 ${j.location}</span>
+              <span>💼 ${j.type}</span>
+              ${j.experience ? `<span>${j.experience}</span>` : ''}
+              ${j.salary ? `<span>💰 ${j.salary}</span>` : ''}
+              <span>${daysAgo(j.posted)}</span>
+            </div>
+            <div class="pub-job-card__tags">
+              ${(j.tags||[]).map(t => `<span style="font-size:12px;padding:3px 10px;border-radius:20px;background:var(--blue-light);color:var(--blue);font-weight:500">${t}</span>`).join('')}
+            </div>
+          </div>
+          <div style="flex-shrink:0">
+            <button class="btn btn--primary btn--sm" onclick="event.stopPropagation();goToJob('${j.id}')">Candidatar</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    function goToJob(jobId) {
+      incrementJobClick(jobId);
+      const isLogged = session && session.type === 'colaborador';
+      if (isLogged) { window.location.href = `colaborador.html?job=${jobId}`; }
+      else           { window.location.href = `index.html?job=${jobId}`; }
+    }
+
+    /* ---- AVALIAÇÕES ---- */
+    function renderAvaliacoes() {
+      const reviews = getReviewsByCompany(companyId);
+      const avgR    = getAverageRating(companyId);
+
+      // Overview
+      if (reviews.length) {
+        const countByRating = [5,4,3,2,1].map(r => reviews.filter(rev => rev.rating === r).length);
+        document.getElementById('reviewOverview').innerHTML = `
+          <div class="rating-overview">
+            <div>
+              <div class="rating-big">${avgR}</div>
+              <div style="margin-top:4px">${starsHTML(parseFloat(avgR), false, '')}</div>
+              <div style="font-size:12px;color:var(--gray);margin-top:4px">${reviews.length} avaliação${reviews.length !== 1 ? 'ões' : ''}</div>
+            </div>
+            <div class="rating-bars">
+              ${[5,4,3,2,1].map((r,i) => `<div class="rating-bar-row">
+                <span class="rating-bar-row__label">${r} ★</span>
+                <div class="rating-bar-row__track"><div class="rating-bar-row__fill" style="width:${reviews.length ? (countByRating[i]/reviews.length*100).toFixed(0) : 0}%"></div></div>
+                <span class="rating-bar-row__count">${countByRating[i]}</span>
+              </div>`).join('')}
+            </div>
+          </div>`;
+      } else {
+        document.getElementById('reviewOverview').innerHTML = '';
+      }
+
+      // Review form (only for logged-in colaboradores)
+      const formWrap = document.getElementById('reviewFormWrap');
+      if (session && session.type === 'colaborador') {
+        const existing = getReviewsByCompany(companyId).find(r => r.userId === session.id);
+        formWrap.innerHTML = `
+          <div class="review-form">
+            <h3>${existing ? 'Editar a minha avaliação' : 'Avaliar esta empresa'}</h3>
+            <div class="stars-interactive" id="reviewStars">
+              ${[1,2,3,4,5].map(i => `<span class="star-i ${i <= (existing ? existing.rating : 0) ? 'active' : ''}" onclick="setReviewRating(${i})" data-v="${i}">★</span>`).join('')}
+            </div>
+            <div class="form-group" style="margin-bottom:12px">
+              <input type="text" id="revTitle" placeholder="Título da avaliação..." value="${existing ? existing.title : ''}" style="padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;width:100%;outline:none" />
+            </div>
+            <div class="form-group" style="margin-bottom:12px">
+              <input type="text" id="revPosition" placeholder="O seu cargo na empresa..." value="${existing ? existing.position || '' : ''}" style="padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;width:100%;outline:none" />
+            </div>
+            <div class="form-group" style="margin-bottom:14px">
+              <textarea id="revComment" rows="4" placeholder="Partilhe a sua experiência..." style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;outline:none;resize:vertical">${existing ? existing.comment : ''}</textarea>
+            </div>
+            <button class="btn btn--primary btn--sm" onclick="submitReview()">Publicar Avaliação</button>
+          </div>`;
+        reviewRating = existing ? existing.rating : 0;
+      } else {
+        formWrap.innerHTML = `<div style="font-size:13px;color:var(--gray);padding:12px 16px;background:var(--gray-light);border-radius:var(--radius);margin-bottom:20px">Faça <a href="index.html" style="color:var(--blue)">login como colaborador</a> para deixar uma avaliação.</div>`;
+      }
+
+      // Reviews list
+      const listEl = document.getElementById('reviewsList');
+      if (!reviews.length) { listEl.innerHTML = '<div style="font-size:14px;color:var(--gray);padding:20px 0">Ainda sem avaliações. Seja o primeiro!</div>'; return; }
+      listEl.innerHTML = reviews.map(r => `
+        <div class="review-card">
+          <div class="review-card__header">
+            <div>
+              <div class="review-card__title">${r.title}</div>
+              <div class="review-card__meta">${r.position ? r.position + ' · ' : ''}${formatDate(r.date)}</div>
+            </div>
+            <div>${starsHTML(r.rating, false, '')}</div>
+          </div>
+          <div class="review-card__body">${r.comment}</div>
+        </div>`).join('');
+    }
+
+    function setReviewRating(val) {
+      reviewRating = val;
+      document.querySelectorAll('#reviewStars .star-i').forEach(s => {
+        s.classList.toggle('active', parseInt(s.dataset.v) <= val);
+      });
+    }
+    function submitReview() {
+      if (!reviewRating) { showToast('Seleccione uma classificação.', 'error'); return; }
+      const title   = document.getElementById('revTitle').value.trim();
+      const comment = document.getElementById('revComment').value.trim();
+      if (!title || !comment) { showToast('Preencha o título e o comentário.', 'error'); return; }
+      addReview({
+        companyId, userId: session.id, rating: reviewRating, title, comment,
+        position: document.getElementById('revPosition').value.trim(),
+      });
+      showToast('Avaliação publicada!', 'success');
+      renderAvaliacoes();
+    }
+
+    /* ---- ENTREVISTAS ---- */
+    function renderEntrevistas() {
+      const reviews = getInterviewReviewsByCompany(companyId);
+      const avg     = getAvgInterviewRating(companyId);
+
+      document.getElementById('intReviewOverview').innerHTML = reviews.length
+        ? `<div style="display:flex;align-items:center;gap:14px;padding:16px 20px;background:var(--blue-pale);border-radius:var(--radius-lg);margin-bottom:20px">
+            <div style="font-size:40px;font-weight:800;color:var(--blue-deep)">${avg}</div>
+            <div>${starsHTML(parseFloat(avg), false, '')}<div style="font-size:12px;color:var(--gray);margin-top:4px">${reviews.length} avaliação${reviews.length!==1?'ões':''} de processo de entrevista</div></div>
+          </div>` : '';
+
+      const formWrap = document.getElementById('intReviewFormWrap');
+      if (session && session.type === 'colaborador') {
+        const existing = reviews.find(r => r.userId === session.id);
+        formWrap.innerHTML = `
+          <div class="review-form">
+            <h3>${existing ? 'Editar avaliação de entrevista' : 'Avaliar o processo de entrevista'}</h3>
+            <div class="stars-interactive" id="intRevStars">
+              ${[1,2,3,4,5].map(i => `<span class="star-i ${i <= (existing ? existing.rating : 0) ? 'active' : ''}" onclick="setIntRevRating(${i})" data-v="${i}">★</span>`).join('')}
+            </div>
+            <div class="form-group" style="margin-bottom:12px">
+              <input type="text" id="irTitle" placeholder="Título da avaliação..." value="${existing ? existing.title : ''}" style="padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;width:100%;outline:none" />
+            </div>
+            <div class="form-group" style="margin-bottom:12px">
+              <textarea id="irComment" rows="3" placeholder="Como foi o processo? Número de rondas, tipo de perguntas, feedback..." style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;outline:none;resize:vertical">${existing ? existing.comment : ''}</textarea>
+            </div>
+            <div style="display:flex;gap:16px;margin-bottom:14px;font-size:13px">
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="radio" name="irOffer" value="1" ${existing && existing.gotOffer ? 'checked' : ''}> Recebi oferta</label>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="radio" name="irOffer" value="0" ${existing && !existing.gotOffer ? 'checked' : ''}> Não recebi oferta</label>
+            </div>
+            <button class="btn btn--primary btn--sm" onclick="submitIntReview()">Publicar</button>
+          </div>`;
+        intRevRating = existing ? existing.rating : 0;
+      } else {
+        formWrap.innerHTML = `<div style="font-size:13px;color:var(--gray);padding:12px 16px;background:var(--gray-light);border-radius:var(--radius);margin-bottom:20px">Faça <a href="index.html" style="color:var(--blue)">login como colaborador</a> para avaliar o processo.</div>`;
+      }
+
+      const listEl = document.getElementById('intReviewsList');
+      if (!reviews.length) { listEl.innerHTML = '<div style="font-size:14px;color:var(--gray);padding:12px 0">Ainda sem avaliações de processo de entrevista.</div>'; return; }
+      listEl.innerHTML = reviews.map(r => `
+        <div class="int-review-card">
+          <div class="int-review-card__header">
+            <div>
+              <div class="int-review-card__title">${r.title}</div>
+              <div style="font-size:12px;color:var(--gray);margin-top:2px">${formatDate(r.date)}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              ${starsHTML(r.rating, false, '')}
+              <span class="int-review-badge ${r.gotOffer ? 'int-review-badge--offer' : 'int-review-badge--nooffer'}">${r.gotOffer ? 'Recebeu oferta' : 'Sem oferta'}</span>
+            </div>
+          </div>
+          <div style="font-size:14px;color:var(--dark-2);line-height:1.7">${r.comment}</div>
+        </div>`).join('');
+    }
+
+    function setIntRevRating(val) {
+      intRevRating = val;
+      document.querySelectorAll('#intRevStars .star-i').forEach(s => {
+        s.classList.toggle('active', parseInt(s.dataset.v) <= val);
+      });
+    }
+    function submitIntReview() {
+      if (!intRevRating) { showToast('Seleccione uma classificação.', 'error'); return; }
+      const title   = document.getElementById('irTitle').value.trim();
+      const comment = document.getElementById('irComment').value.trim();
+      if (!title || !comment) { showToast('Preencha o título e o comentário.', 'error'); return; }
+      const gotOffer = document.querySelector('input[name="irOffer"]:checked')?.value === '1';
+      addInterviewReview({ companyId, userId: session.id, rating: intRevRating, title, comment, gotOffer, applied: true });
+      showToast('Avaliação de entrevista publicada!', 'success');
+      renderEntrevistas();
+    }
+
+    /* ---- Q&A ---- */
+    function renderQA() {
+      const qaList = getQAByCompany(companyId);
+      const formWrap = document.getElementById('qaFormWrap');
+
+      if (session && session.type === 'colaborador') {
+        formWrap.innerHTML = `
+          <div style="display:flex;gap:10px;margin-bottom:20px">
+            <input type="text" id="qaInput" placeholder="Faça uma pergunta sobre esta empresa..." style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;outline:none" />
+            <button class="btn btn--primary btn--sm" onclick="submitQuestion()">Perguntar</button>
+          </div>`;
+      } else {
+        formWrap.innerHTML = `<div style="font-size:13px;color:var(--gray);padding:12px 16px;background:var(--gray-light);border-radius:var(--radius);margin-bottom:20px">Faça <a href="index.html" style="color:var(--blue)">login</a> para fazer uma pergunta.</div>`;
+      }
+
+      const listEl = document.getElementById('qaList');
+      if (!qaList.length) { listEl.innerHTML = '<div style="font-size:14px;color:var(--gray)">Ainda sem perguntas. Seja o primeiro!</div>'; return; }
+      listEl.innerHTML = qaList.map(q => `
+        <div class="qa-item">
+          <div class="qa-item__question">
+            <span class="qa-item__q-icon">❓</span>
+            <div>
+              <div class="qa-item__q-text">${q.question}</div>
+              <div class="qa-item__meta">${formatDate(q.date)}</div>
+            </div>
+          </div>
+          ${q.answer
+            ? `<div class="qa-item__answer">
+                <span class="qa-item__a-icon">💬</span>
+                <div>
+                  <div class="qa-item__a-text">${q.answer}</div>
+                  <div class="qa-item__a-meta">${q.answeredBy} · ${formatDate(q.answeredAt)}</div>
+                </div>
+              </div>`
+            : `<div class="qa-unanswered">Aguarda resposta da empresa</div>`}
+        </div>`).join('');
+    }
+    function submitQuestion() {
+      const input = document.getElementById('qaInput');
+      const text  = input.value.trim();
+      if (!text) return;
+      addQuestion({ companyId, userId: session.id, question: text });
+      input.value = '';
+      showToast('Pergunta enviada!', 'success');
+      renderQA();
+    }
+
+    /* ---- EVENTOS ---- */
+    function renderEventos() {
+      const events = getEventsByCompany(companyId).filter(e => e.date >= new Date().toISOString().slice(0,10));
+      const el     = document.getElementById('pubEventos');
+      if (!events.length) { el.innerHTML = '<div style="font-size:14px;color:var(--gray)">Sem eventos agendados.</div>'; return; }
+      el.innerHTML = events.map(ev => {
+        const d = new Date(ev.date);
+        const registered = session ? isRegisteredForEvent(ev.id, session.id) : false;
+        return `<div class="event-card" style="margin-bottom:14px">
+          <div class="event-card__date-box">
+            <div class="event-card__day">${d.getDate().toString().padStart(2,'0')}</div>
+            <div class="event-card__month">${d.toLocaleDateString('pt-PT',{month:'short'})}</div>
+          </div>
+          <div class="event-card__info">
+            <div class="event-card__title">${ev.title}</div>
+            <div class="event-card__meta">
+              <span>🕐 ${ev.time}</span>
+              <span>📍 ${ev.location}</span>
+              <span>💻 ${ev.format}</span>
+              <span>👥 ${(ev.registrations||[]).length} inscritos</span>
+            </div>
+            <div class="event-card__desc">${ev.description}</div>
+          </div>
+          <div class="event-card__actions">
+            ${session && session.type === 'colaborador'
+              ? registered
+                ? `<span class="status-badge status--accepted">✓ Inscrito</span>
+                   <button class="btn btn--ghost btn--sm" onclick="pubUnregister('${ev.id}')">Cancelar</button>`
+                : `<button class="btn btn--primary btn--sm" onclick="pubRegister('${ev.id}')">Inscrever-me</button>`
+              : `<a href="index.html" class="btn btn--primary btn--sm">Login para inscrever</a>`}
+          </div>
+        </div>`;
+      }).join('');
+    }
+    function pubRegister(evId)   { registerForEvent(evId, session.id); showToast('Inscrito!', 'success'); renderEventos(); }
+    function pubUnregister(evId) { unregisterFromEvent(evId, session.id); showToast('Inscrição cancelada.', 'info'); renderEventos(); }
+
+    /* ---- FOLLOW ---- */
+    function getFollowed()          { try { return JSON.parse(localStorage.getItem('pc_followed') || '[]'); } catch { return []; } }
+    function isFollowing(cId)       { return getFollowed().includes(cId); }
+    function toggleFollow() {
+      const followed = getFollowed();
+      const idx = followed.indexOf(companyId);
+      if (idx >= 0) followed.splice(idx, 1); else followed.push(companyId);
+      localStorage.setItem('pc_followed', JSON.stringify(followed));
+      updateFollowBtn();
+      showToast(isFollowing(companyId) ? 'A seguir a empresa!' : 'Deixou de seguir.', 'info');
+    }
+    function updateFollowBtn() {
+      const btn = document.getElementById('followBtn');
+      btn.textContent = isFollowing(companyId) ? '✓ A Seguir' : '+ Seguir';
+      btn.className   = isFollowing(companyId) ? 'btn btn--primary btn--sm' : 'btn btn--ghost btn--sm';
+    }
+
+    /* ---- SHARE ---- */
+    function copyPageLink()  { navigator.clipboard.writeText(location.href).then(() => showToast('Link copiado!', 'success')); }
+    function shareWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(company.companyName + ' — ' + location.href)}`, '_blank'); }
+
+    /* ---- TOAST ---- */
+    function showToast(msg, type) {
+      const c = document.getElementById('toastContainer'), t = document.createElement('div');
+      t.className = `toast toast--${type||'info'}`; t.textContent = msg; c.appendChild(t); setTimeout(() => t.remove(), 3500);
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

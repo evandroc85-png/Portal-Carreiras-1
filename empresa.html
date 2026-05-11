@@ -1,0 +1,1904 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal Carreiras — Área da Empresa</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* Summary cards */
+    .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .summary-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 24px; }
+    .summary-card__label { font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 8px; }
+    .summary-card__value { font-size: 32px; font-weight: 700; color: var(--blue-deep); letter-spacing: -.6px; }
+    .summary-card__sub { font-size: 12px; color: var(--gray); margin-top: 4px; }
+    .summary-card--blue { border-color: var(--blue); background: var(--blue-pale); }
+    .summary-card--blue .summary-card__value { color: var(--blue); }
+    .summary-card--green { border-color: #10b981; background: #ecfdf5; }
+    .summary-card--green .summary-card__value { color: #059669; }
+    .summary-card--orange { border-color: var(--orange); background: #fff7ed; }
+    .summary-card--orange .summary-card__value { color: var(--orange); }
+
+    /* Badge count in nav */
+    .badge-count { display: inline-flex; align-items: center; justify-content: center; background: var(--blue); color: white; font-size: 11px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; padding: 0 5px; margin-left: 4px; }
+
+    /* Job manage card */
+    .job-manage-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; display: flex; align-items: flex-start; gap: 16px; margin-bottom: 12px; transition: var(--transition); }
+    .job-manage-card:hover { border-color: var(--blue); }
+    .job-manage-card__info { flex: 1; min-width: 0; }
+    .job-manage-card__title { font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+    .job-manage-card__meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--gray); margin-bottom: 8px; }
+    .job-manage-card__stats { font-size: 13px; color: var(--dark-2); }
+    .job-manage-card__actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; flex-shrink: 0; }
+    .job-manage-card__badges { display: flex; gap: 6px; margin-bottom: 2px; }
+
+    /* Status action bar */
+    .status-action-bar { background: var(--gray-light); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .status-action-bar label { font-size: 13px; font-weight: 600; color: var(--dark); white-space: nowrap; }
+
+    /* Applicant card */
+    .profile-view__header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+    .profile-view__meta h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .profile-view__meta .role { font-size: 14px; color: var(--blue); font-weight: 500; margin-bottom: 8px; }
+    .profile-view__meta .contacts { display: flex; flex-wrap: wrap; gap: 10px; font-size: 13px; color: var(--gray); }
+    .profile-view__section { margin-bottom: 20px; }
+    .profile-view__section h3 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--gray); margin-bottom: 10px; }
+    .exp-view { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+    .exp-view:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .exp-view__title { font-size: 14px; font-weight: 600; }
+    .exp-view__company { font-size: 13px; color: var(--blue); margin: 2px 0; }
+    .exp-view__period { font-size: 12px; color: var(--gray); margin-bottom: 3px; }
+    .exp-view__desc { font-size: 13px; color: var(--gray); line-height: 1.6; }
+    .cv-download-btn { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--blue-pale); border: 1px solid #bfdbfe; border-radius: var(--radius); cursor: pointer; transition: var(--transition); }
+    .cv-download-btn:hover { background: var(--blue-light); }
+    .cv-download-btn svg { width: 20px; height: 20px; color: var(--blue); flex-shrink: 0; }
+    .cv-download-btn span { font-size: 14px; font-weight: 600; color: var(--blue-deep); }
+    .cv-download-btn small { font-size: 12px; color: var(--gray); }
+
+    /* Modal tabs */
+    .modal-tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; gap: 4px; overflow-x: auto; }
+    .modal-tab { padding: 10px 16px; font-size: 13px; font-weight: 600; color: var(--gray); border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; transition: var(--transition); }
+    .modal-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+    .modal-tab:hover:not(.active) { color: var(--dark); }
+    .modal-tab-pane { display: none; }
+    .modal-tab-pane.active { display: block; }
+
+    /* Screening answers */
+    .screening-answer { background: var(--gray-light); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 10px; }
+    .screening-answer__q { font-size: 12px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 6px; }
+    .screening-answer__a { font-size: 14px; color: var(--dark); }
+
+    /* Interview card in modal */
+    .interview-info { background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px; }
+    .interview-info__row { display: flex; gap: 20px; flex-wrap: wrap; font-size: 13px; }
+    .interview-info__item { display: flex; flex-direction: column; gap: 3px; }
+    .interview-info__label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #059669; }
+    .interview-info__val { font-weight: 600; color: var(--dark); }
+
+    /* Internal notes */
+    .note-item { border-left: 3px solid var(--blue); padding: 10px 14px; margin-bottom: 10px; background: var(--blue-pale); border-radius: 0 var(--radius) var(--radius) 0; }
+    .note-item__text { font-size: 14px; color: var(--dark); line-height: 1.6; }
+    .note-item__meta { font-size: 11px; color: var(--gray); margin-top: 6px; }
+    .note-add-area { display: flex; gap: 8px; margin-top: 12px; }
+    .note-add-area textarea { flex: 1; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--radius); font-size: 13px; font-family: inherit; resize: vertical; min-height: 70px; outline: none; transition: var(--transition); }
+    .note-add-area textarea:focus { border-color: var(--blue); }
+
+    /* Screening builder */
+    .sq-builder-item { background: var(--gray-light); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 10px; display: flex; gap: 10px; align-items: flex-start; }
+    .sq-builder-item input { flex: 1; padding: 8px 12px; border: 1.5px solid var(--border); border-radius: var(--radius); font-size: 13px; font-family: inherit; outline: none; }
+    .sq-builder-item input:focus { border-color: var(--blue); }
+    .sq-builder-item select { padding: 8px 10px; border: 1.5px solid var(--border); border-radius: var(--radius); font-size: 13px; font-family: inherit; outline: none; background: var(--white); }
+    .sq-builder-item button { padding: 8px; border: none; background: none; color: var(--gray); cursor: pointer; border-radius: var(--radius); transition: var(--transition); }
+    .sq-builder-item button:hover { background: #fee2e2; color: #dc2626; }
+
+    /* Featured toggle */
+    .toggle-featured { display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: #fffbeb; border: 1.5px solid #fde68a; border-radius: var(--radius); cursor: pointer; }
+    .toggle-featured input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--blue); cursor: pointer; }
+    .toggle-featured label { font-size: 14px; font-weight: 600; color: var(--dark); cursor: pointer; }
+    .toggle-featured small { font-size: 12px; color: var(--gray); }
+
+    /* Reports */
+    .reports-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px; }
+    .report-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; }
+    .report-card__title { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 18px; }
+    .chart-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .chart-row__label { font-size: 12px; color: var(--dark-2); min-width: 130px; max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chart-row__bar-wrap { flex: 1; background: var(--gray-light); border-radius: 4px; height: 10px; overflow: hidden; }
+    .chart-row__bar-fill { height: 100%; border-radius: 4px; background: var(--blue); transition: width .5s ease; }
+    .chart-row__val { font-size: 12px; font-weight: 700; color: var(--dark-2); min-width: 24px; text-align: right; }
+
+    /* Status donut (simplified pill chart) */
+    .status-pills { display: flex; flex-direction: column; gap: 10px; }
+    .status-pill { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+    .status-pill__dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .status-pill__label { flex: 1; color: var(--dark-2); }
+    .status-pill__count { font-weight: 700; color: var(--dark); }
+    .status-pill__pct { font-size: 11px; color: var(--gray); }
+
+    /* Company profile extra fields */
+    .profile-section-heading { font-size: 13px; font-weight: 700; color: var(--dark); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 16px; margin-top: 28px; }
+
+    @media (max-width: 860px) {
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .reports-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .summary-grid { grid-template-columns: 1fr 1fr; }
+      .job-manage-card { flex-direction: column; }
+      .job-manage-card__actions { flex-direction: row; flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body class="dash-body">
+
+  <!-- NAVBAR -->
+  <header class="dash-navbar">
+    <div class="container">
+      <a href="index.html" class="navbar__logo"><img src="logo-icon.svg" alt="Portal Carreiras" /><div class="navbar__logo-text"><span>Portal</span><span>Carreiras</span></div></a>
+      <nav class="dash-nav-links">
+        <button class="dash-nav-link active" onclick="showPage('dashboard')" id="navDashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </button>
+        <button class="dash-nav-link" onclick="showPage('vagas')" id="navVagas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          As Minhas Vagas
+        </button>
+        <button class="dash-nav-link" onclick="showPage('publicar')" id="navPublicar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          Publicar Vaga
+        </button>
+        <button class="dash-nav-link" onclick="showPage('mensagens')" id="navMensagens">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Mensagens
+          <span id="navMsgBadge" class="badge-count" style="display:none">0</span>
+        </button>
+        <button class="dash-nav-link" onclick="showPage('candidatos')" id="navCandidatos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Candidatos
+        </button>
+        <button class="dash-nav-link" onclick="showPage('kanban')" id="navKanban">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="10" y="3" width="5" height="12" rx="1"/><rect x="17" y="3" width="5" height="15" rx="1"/></svg>
+          Pipeline
+        </button>
+        <button class="dash-nav-link" onclick="showPage('eventos')" id="navEventos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Eventos
+        </button>
+        <button class="dash-nav-link" onclick="showPage('relatorios')" id="navRelatorios">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Relatórios
+        </button>
+        <button class="dash-nav-link" onclick="showPage('perfil')" id="navPerfil">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Perfil
+        </button>
+      </nav>
+      <div class="navbar__user">
+        <div class="avatar avatar--company" style="width:36px;height:36px;font-size:13px;border-radius:8px" id="userAvatar">?</div>
+        <span class="navbar__user-name" id="userName">—</span>
+        <button class="btn btn--ghost btn--sm" onclick="logout()">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="dash-main">
+    <div class="container">
+
+      <!-- ===== PAGE: DASHBOARD ===== -->
+      <div class="dash-page active" id="pageDashboard">
+        <div class="page-header">
+          <div>
+            <h1 id="dashWelcome">Bem-vindo</h1>
+            <p>Resumo da actividade da sua empresa</p>
+          </div>
+          <button class="btn btn--primary" onclick="showPage('publicar')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nova Vaga
+          </button>
+        </div>
+
+        <div class="summary-grid">
+          <div class="summary-card summary-card--blue">
+            <div class="summary-card__label">Vagas Activas</div>
+            <div class="summary-card__value" id="statActiveJobs">0</div>
+            <div class="summary-card__sub">publicadas no portal</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card__label">Total Candidaturas</div>
+            <div class="summary-card__value" id="statTotalApps">0</div>
+            <div class="summary-card__sub">recebidas</div>
+          </div>
+          <div class="summary-card summary-card--orange">
+            <div class="summary-card__label">Por Analisar</div>
+            <div class="summary-card__value" id="statPending">0</div>
+            <div class="summary-card__sub">aguardam decisão</div>
+          </div>
+          <div class="summary-card summary-card--green">
+            <div class="summary-card__label">Aceites</div>
+            <div class="summary-card__value" id="statAccepted">0</div>
+            <div class="summary-card__sub">candidaturas aceites</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px" id="dashCharts">
+          <div class="report-card">
+            <div class="report-card__title">Candidaturas por Vaga</div>
+            <div id="dashChartByJob"></div>
+          </div>
+          <div class="report-card">
+            <div class="report-card__title">Distribuição por Estado</div>
+            <div id="dashChartByStatus" class="status-pills"></div>
+          </div>
+        </div>
+
+        <div class="page-header" style="margin-bottom:14px">
+          <h1 style="font-size:16px">Candidaturas Recentes</h1>
+          <button class="btn btn--ghost btn--sm" onclick="showPage('vagas')">Ver todas →</button>
+        </div>
+        <div id="recentApps"></div>
+      </div>
+
+      <!-- ===== PAGE: AS MINHAS VAGAS ===== -->
+      <div class="dash-page" id="pageVagas">
+        <div id="vagasListView">
+          <div class="page-header">
+            <div>
+              <h1>As Minhas Vagas</h1>
+              <p>Gira as vagas e veja os candidatos</p>
+            </div>
+            <button class="btn btn--primary" onclick="showPage('publicar')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Nova Vaga
+            </button>
+          </div>
+          <div id="jobsList"></div>
+        </div>
+
+        <!-- Applicants for a specific job -->
+        <div id="applicantsView" class="hidden">
+          <div class="applicants-header">
+            <button class="back-btn" onclick="backToJobs()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+              Voltar às vagas
+            </button>
+            <div>
+              <h2 style="font-size:18px;font-weight:700" id="applicantsJobTitle">—</h2>
+              <div style="font-size:13px;color:var(--gray)" id="applicantsJobMeta">—</div>
+            </div>
+          </div>
+          <div class="filter-bar" style="margin-bottom:20px">
+            <select id="filterApplicantStatus" onchange="renderApplicants()">
+              <option value="">Todos os estados</option>
+              <option value="pendente">Pendente</option>
+              <option value="em_analise">Em Análise</option>
+              <option value="aceite">Aceite</option>
+              <option value="rejeitado">Rejeitado</option>
+            </select>
+          </div>
+          <div id="applicantsList"></div>
+        </div>
+      </div>
+
+      <!-- ===== PAGE: PUBLICAR VAGA ===== -->
+      <div class="dash-page" id="pagePublicar">
+        <div class="page-header">
+          <div>
+            <h1 id="publishPageTitle">Publicar Nova Vaga</h1>
+            <p id="publishPageSub">Preencha os detalhes da posição que pretende divulgar</p>
+          </div>
+        </div>
+
+        <!-- Template picker -->
+        <div class="form-card" style="max-width:760px;margin-bottom:16px;padding:16px 20px">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <span style="font-size:13px;font-weight:600;color:var(--dark)">Usar template:</span>
+            <select id="templateSelect" onchange="applyTemplate()" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;outline:none">
+              <option value="">— Nenhum —</option>
+              <option value="software">Engenheiro(a) de Software</option>
+              <option value="designer">Designer UX/UI</option>
+              <option value="data">Analista de Dados</option>
+              <option value="pm">Product Manager</option>
+              <option value="marketing">Gestor(a) de Marketing</option>
+              <option value="ops">Operations Manager</option>
+            </select>
+            <span style="font-size:12px;color:var(--gray)">Pré-preenche o formulário com um modelo base</span>
+          </div>
+        </div>
+
+        <div class="form-card" style="max-width:760px">
+          <form onsubmit="handlePublishJob(event)" id="jobForm">
+            <div id="jobFormAlert"></div>
+            <input type="hidden" id="jEditId" value="" />
+
+            <div class="form-group form-group--half">
+              <div>
+                <label>Título da Vaga *</label>
+                <input type="text" id="jTitle" placeholder="ex: Engenheiro(a) de Software Sénior" required />
+              </div>
+              <div>
+                <label>Localização *</label>
+                <input type="text" id="jLocation" placeholder="ex: Lisboa, Porto, Remoto" required />
+              </div>
+            </div>
+            <div class="form-group form-group--half">
+              <div>
+                <label>Tipo de Contrato *</label>
+                <select id="jType" required>
+                  <option value="">Seleccionar...</option>
+                  <option>Full-time</option>
+                  <option>Part-time</option>
+                  <option>Freelance</option>
+                  <option>Estágio</option>
+                </select>
+              </div>
+              <div>
+                <label>Nível de Experiência</label>
+                <select id="jExperience">
+                  <option value="">Seleccionar...</option>
+                  <option>Júnior (0-2 anos)</option>
+                  <option>Pleno (2-5 anos)</option>
+                  <option>Sénior (5+ anos)</option>
+                  <option>Gestão</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group form-group--half">
+              <div>
+                <label>Salário Mínimo (€/mês)</label>
+                <input type="number" id="jSalaryMin" placeholder="ex: 2000" min="0" step="100" />
+              </div>
+              <div>
+                <label>Salário Máximo (€/mês)</label>
+                <input type="number" id="jSalaryMax" placeholder="ex: 3500" min="0" step="100" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Tags / Competências relevantes</label>
+              <input type="text" id="jTags" placeholder="ex: React, Node.js, AWS (separar por vírgula)" />
+              <div class="form-hint">Separar por vírgula. Facilita a descoberta da vaga.</div>
+            </div>
+            <div class="form-group">
+              <label>Descrição da Vaga *</label>
+              <textarea id="jDescription" rows="10"
+                placeholder="Descreva a posição, responsabilidades, requisitos e o que a empresa oferece..."></textarea>
+            </div>
+
+            <!-- Featured toggle -->
+            <div class="form-group">
+              <div class="toggle-featured">
+                <input type="checkbox" id="jFeatured" />
+                <div>
+                  <label for="jFeatured">⭐ Destacar esta vaga</label>
+                  <div><small>Vagas destacadas aparecem no topo dos resultados de pesquisa</small></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Screening questions -->
+            <div class="form-group">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                <div>
+                  <label style="margin-bottom:0">Perguntas de Triagem</label>
+                  <div class="form-hint" style="margin-top:2px">Perguntas respondidas pelo candidato durante a candidatura</div>
+                </div>
+                <button type="button" class="btn btn--ghost btn--sm" onclick="addScreeningQuestion()">+ Adicionar</button>
+              </div>
+              <div id="screeningQuestionsList"></div>
+            </div>
+
+            <div style="display:flex;gap:12px;justify-content:flex-end;padding-top:8px">
+              <button type="button" class="btn btn--ghost" onclick="cancelPublish()">Cancelar</button>
+              <button type="submit" class="btn btn--primary" id="publishSubmitBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+                Publicar Vaga
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ===== PAGE: CANDIDATOS (search) ===== -->
+      <div class="dash-page" id="pageCandidatos">
+        <div class="page-header">
+          <div><h1>Pesquisar Candidatos</h1><p>Encontre talentos activos no portal</p></div>
+        </div>
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px">
+          <div class="filter-bar" style="margin-bottom:12px">
+            <input type="text" id="cndQ" placeholder="Nome, cargo ou palavra-chave..." style="flex:1" />
+            <input type="text" id="cndSkills" placeholder="Competências (separar por vírgula)..." style="flex:1" />
+            <input type="text" id="cndLoc" placeholder="Localização..." style="max-width:180px" />
+            <select id="cndAvail">
+              <option value="">Disponibilidade</option>
+              <option value="active">À procura activamente</option>
+              <option value="open">Aberto a propostas</option>
+            </select>
+            <button class="btn btn--primary" onclick="runCandidateSearch()">Pesquisar</button>
+          </div>
+        </div>
+        <div id="candidateResults"></div>
+      </div>
+
+      <!-- ===== PAGE: KANBAN PIPELINE ===== -->
+      <div class="dash-page" id="pageKanban">
+        <div class="page-header">
+          <div><h1>Pipeline de Recrutamento</h1><p>Vista kanban de todas as candidaturas activas</p></div>
+          <select id="kanbanJobFilter" onchange="renderKanban()" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;outline:none">
+            <option value="">Todas as vagas</option>
+          </select>
+        </div>
+        <div class="kanban-board" id="kanbanBoard"></div>
+      </div>
+
+      <!-- ===== PAGE: EVENTOS ===== -->
+      <div class="dash-page" id="pageEventos">
+        <div class="page-header">
+          <div><h1>Eventos de Recrutamento</h1><p>Crie e gira eventos para atrair candidatos</p></div>
+          <button class="btn btn--primary" onclick="showCreateEvent()">+ Criar Evento</button>
+        </div>
+        <div id="createEventForm" class="form-card" style="max-width:680px;margin-bottom:24px;display:none">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:16px">Novo Evento</h3>
+          <div class="form-group"><label>Título *</label><input type="text" id="evTitle" placeholder="ex: NovaTech Tech Day 2026" /></div>
+          <div class="form-group form-group--half">
+            <div><label>Data *</label><input type="date" id="evDate" /></div>
+            <div><label>Hora *</label><input type="time" id="evTime" /></div>
+          </div>
+          <div class="form-group form-group--half">
+            <div><label>Formato</label>
+              <select id="evFormat"><option>Presencial</option><option>Online</option><option>Híbrido</option></select>
+            </div>
+            <div><label>Local / Link</label><input type="text" id="evLocation" placeholder="ex: Lisboa, Google Meet..." /></div>
+          </div>
+          <div class="form-group"><label>Descrição</label><textarea id="evDesc" rows="4" placeholder="Descreva o evento..."></textarea></div>
+          <div style="display:flex;gap:10px;justify-content:flex-end">
+            <button class="btn btn--ghost" onclick="hideCreateEvent()">Cancelar</button>
+            <button class="btn btn--primary" onclick="submitCreateEvent()">Criar Evento</button>
+          </div>
+        </div>
+        <div id="empresaEventosList" style="display:flex;flex-direction:column;gap:14px"></div>
+      </div>
+
+      <!-- ===== PAGE: MENSAGENS ===== -->
+      <div class="dash-page" id="pageMensagens">
+        <div class="page-header" style="margin-bottom:20px">
+          <div>
+            <h1>Mensagens</h1>
+            <p>Comunicação com os candidatos</p>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:320px 1fr;gap:20px;min-height:500px">
+          <!-- Thread list -->
+          <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+            <div style="padding:14px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700;color:var(--dark)">Conversas</div>
+            <div id="msgThreadList" style="overflow-y:auto;max-height:600px"></div>
+          </div>
+          <!-- Chat panel -->
+          <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;display:flex;flex-direction:column">
+            <div id="msgChatPanel" style="flex:1;display:flex;align-items:center;justify-content:center">
+              <div style="text-align:center;color:var(--gray);padding:40px">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;margin:0 auto 12px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <div style="font-size:14px">Seleccione uma conversa</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PAGE: RELATÓRIOS ===== -->
+      <div class="dash-page" id="pageRelatorios">
+        <div class="page-header">
+          <div>
+            <h1>Relatórios &amp; Análises</h1>
+            <p>Métricas de recrutamento da sua empresa</p>
+          </div>
+          <button class="btn btn--ghost btn--sm" onclick="exportReportCSV()">⬇ Exportar CSV</button>
+        </div>
+
+        <!-- FILTROS -->
+        <div class="report-filters">
+          <div class="report-filters__row">
+            <div class="filter-group">
+              <label>Ano</label>
+              <select id="rfYear" onchange="syncDateFromYear()">
+                <option value="">Todos</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>De</label>
+              <input type="date" id="rfDateFrom" />
+            </div>
+            <div class="filter-group">
+              <label>Até</label>
+              <input type="date" id="rfDateTo" />
+            </div>
+            <div class="filter-group filter-group--wide">
+              <label>Vaga</label>
+              <select id="rfJob">
+                <option value="">Todas as vagas</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>Resultado</label>
+              <select id="rfHired">
+                <option value="">Todas</option>
+                <option value="hired">Com contratação</option>
+                <option value="open">Sem contratação</option>
+                <option value="active">Ainda activas</option>
+              </select>
+            </div>
+            <div class="filter-group filter-group--actions">
+              <button class="btn btn--primary btn--sm" onclick="applyReportFilters()">Filtrar</button>
+              <button class="btn btn--ghost btn--sm" onclick="clearReportFilters()">Limpar</button>
+            </div>
+          </div>
+          <div id="reportActiveFilters" style="display:none;margin-top:10px;font-size:13px;color:var(--gray)"></div>
+        </div>
+
+        <div class="summary-grid" id="reportStats"></div>
+        <div class="reports-grid" id="reportCharts"></div>
+      </div>
+
+      <!-- ===== PAGE: PERFIL ===== -->
+      <div class="dash-page" id="pagePerfil">
+        <div class="page-header">
+          <div>
+            <h1>Perfil da Empresa</h1>
+            <p>Informação pública visível pelos candidatos</p>
+          </div>
+          <a class="btn btn--ghost btn--sm" id="viewPublicProfileBtn" href="#">Ver perfil público →</a>
+        </div>
+        <div class="form-card" style="max-width:700px">
+          <form onsubmit="saveCompanyProfile(event)">
+            <div id="companyProfileAlert"></div>
+
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border)">
+              <div class="avatar avatar--company" style="width:64px;height:64px;font-size:22px;border-radius:16px" id="companyAvatarBig">?</div>
+              <div>
+                <div style="font-size:17px;font-weight:700" id="companyNameBig">—</div>
+                <div style="font-size:13px;color:var(--gray)" id="companySectorBig">—</div>
+                <a id="publicPageLink" href="#" style="font-size:12px;color:var(--blue);text-decoration:none;margin-top:2px;display:block">Ver página pública →</a>
+              </div>
+            </div>
+
+            <div class="profile-section-heading" style="margin-top:0">Informação Base</div>
+            <div class="form-group form-group--half">
+              <div><label>Nome da Empresa *</label><input type="text" id="cpName" placeholder="Nome da empresa" required /></div>
+              <div>
+                <label>Sector de Actividade</label>
+                <select id="cpSector">
+                  <option value="">Seleccionar...</option>
+                  <option>Tecnologia</option><option>Saúde</option><option>Finanças</option>
+                  <option>Retalho</option><option>Educação</option><option>Design &amp; Criatividade</option>
+                  <option>Data &amp; Analytics</option><option>Logística</option><option>Outro</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group form-group--half">
+              <div><label>Localização</label><input type="text" id="cpLocation" placeholder="ex: Lisboa" /></div>
+              <div><label>Website</label><input type="text" id="cpWebsite" placeholder="ex: www.empresa.pt" /></div>
+            </div>
+            <div class="form-group form-group--half">
+              <div>
+                <label>Dimensão da Empresa</label>
+                <select id="cpSize">
+                  <option value="">Seleccionar...</option>
+                  <option>1-10 colaboradores</option><option>11-50 colaboradores</option>
+                  <option>51-200 colaboradores</option><option>201-500 colaboradores</option>
+                  <option>501-1000 colaboradores</option><option>1000+ colaboradores</option>
+                </select>
+              </div>
+              <div><label>Ano de Fundação</label><input type="number" id="cpFounded" placeholder="ex: 2015" min="1900" max="2030" /></div>
+            </div>
+
+            <div class="profile-section-heading">Apresentação</div>
+            <div class="form-group">
+              <label>Sobre a Empresa</label>
+              <textarea id="cpAbout" rows="4" placeholder="Descreva brevemente a empresa, a sua missão e visão..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Cultura &amp; Valores</label>
+              <textarea id="cpCulture" rows="3" placeholder="O que torna a vossa cultura única? O que valorizam na equipa?"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Benefícios</label>
+              <textarea id="cpBenefits" rows="3" placeholder="ex: Seguro de saúde · Trabalho remoto · Orçamento de formação..."></textarea>
+            </div>
+
+            <div style="display:flex;gap:12px;justify-content:flex-end">
+              <button type="submit" class="btn btn--primary">Guardar Perfil</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div><!-- /container -->
+  </main>
+
+  <!-- CANDIDATE PROFILE MODAL -->
+  <div class="modal-overlay" id="profileModal" onclick="closeProfileModal()">
+    <div class="modal" style="max-width:660px;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
+      <button class="modal__close" onclick="closeProfileModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div id="profileModalContent"></div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="app-data.js"></script>
+  <script>
+    'use strict';
+
+    /* =============================================
+       AUTH
+       ============================================= */
+    let currentUser = requireAuth('empresa');
+    let currentViewJobId = null;
+    let currentMsgAppId  = null;
+    let msgPollTimer     = null;
+    let screeningQs      = []; // screening questions being built
+
+    /* =============================================
+       INIT
+       ============================================= */
+    function initUI() {
+      const avatar = currentUser.avatar || (currentUser.companyName || '?').slice(0, 2).toUpperCase();
+      document.getElementById('userAvatar').textContent = avatar;
+      document.getElementById('userName').textContent   = currentUser.companyName || currentUser.email;
+      document.getElementById('dashWelcome').textContent = 'Bem-vindo, ' + (currentUser.companyName || 'Empresa');
+      updateNavBadge();
+      loadDashboard();
+    }
+
+    function logout() { clearSession(); window.location.href = '/'; }
+
+    function updateNavBadge() {
+      const count = getUnreadCount(currentUser.id, 'empresa');
+      const badge = document.getElementById('navMsgBadge');
+      if (count > 0) { badge.textContent = count; badge.style.display = 'inline-flex'; }
+      else badge.style.display = 'none';
+    }
+
+    /* =============================================
+       NAVIGATION
+       ============================================= */
+    function showPage(page) {
+      document.querySelectorAll('.dash-page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.dash-nav-link').forEach(l => l.classList.remove('active'));
+      const key = page.charAt(0).toUpperCase() + page.slice(1);
+      document.getElementById('page' + key).classList.add('active');
+      document.getElementById('nav'  + key).classList.add('active');
+      if (page === 'dashboard')   loadDashboard();
+      if (page === 'vagas')       { backToJobs(); renderJobs(); }
+      if (page === 'publicar')    resetJobForm();
+      if (page === 'candidatos')  initCandidateSearch();
+      if (page === 'kanban')      { populateKanbanFilter(); renderKanban(); }
+      if (page === 'eventos')     loadEmpresaEventos();
+      if (page === 'mensagens')   loadMessages();
+      if (page === 'relatorios')  loadReports();
+      if (page === 'perfil')      loadCompanyProfile();
+      updateNavBadge();
+    }
+
+    /* =============================================
+       DASHBOARD
+       ============================================= */
+    function loadDashboard() {
+      const myJobs = getJobsByCompany(currentUser.id);
+      const allApps = myJobs.flatMap(j => getApplicationsByJob(j.id));
+
+      document.getElementById('statActiveJobs').textContent = myJobs.filter(j => j.status === 'active').length;
+      document.getElementById('statTotalApps').textContent  = allApps.length;
+      document.getElementById('statPending').textContent    = allApps.filter(a => a.status === 'pendente' || a.status === 'em_analise').length;
+      document.getElementById('statAccepted').textContent   = allApps.filter(a => a.status === 'aceite').length;
+
+      // Chart: by job
+      const jobChart = document.getElementById('dashChartByJob');
+      if (!myJobs.length) { jobChart.innerHTML = '<div style="font-size:13px;color:var(--gray)">Sem dados ainda.</div>'; }
+      else {
+        const sorted = [...myJobs].sort((a, b) => getApplicationsByJob(b.id).length - getApplicationsByJob(a.id).length).slice(0, 5);
+        const maxCount = Math.max(...sorted.map(j => getApplicationsByJob(j.id).length), 1);
+        jobChart.innerHTML = sorted.map(j => {
+          const c = getApplicationsByJob(j.id).length;
+          return `<div class="chart-row">
+            <div class="chart-row__label" title="${j.title}">${j.title.length > 18 ? j.title.slice(0,16)+'…' : j.title}</div>
+            <div class="chart-row__bar-wrap"><div class="chart-row__bar-fill" style="width:${(c/maxCount*100).toFixed(0)}%"></div></div>
+            <div class="chart-row__val">${c}</div>
+          </div>`;
+        }).join('');
+      }
+
+      // Chart: by status
+      const statusChart = document.getElementById('dashChartByStatus');
+      const total = allApps.length || 1;
+      const statuses = [
+        { key: 'pendente',   label: 'Pendente',   color: '#f59e0b' },
+        { key: 'em_analise', label: 'Em Análise', color: '#3b82f6' },
+        { key: 'aceite',     label: 'Aceite',     color: '#10b981' },
+        { key: 'rejeitado',  label: 'Rejeitado',  color: '#ef4444' },
+      ];
+      statusChart.innerHTML = statuses.map(s => {
+        const c = allApps.filter(a => a.status === s.key).length;
+        return `<div class="status-pill">
+          <div class="status-pill__dot" style="background:${s.color}"></div>
+          <div class="status-pill__label">${s.label}</div>
+          <div class="status-pill__count">${c}</div>
+          <div class="status-pill__pct">${allApps.length ? ((c/allApps.length)*100).toFixed(0)+'%' : '0%'}</div>
+        </div>`;
+      }).join('');
+
+      // Recent apps
+      const recent = [...allApps].sort((a, b) => new Date(b.appliedAt) - new Date(a.appliedAt)).slice(0, 5);
+      const container = document.getElementById('recentApps');
+      if (!recent.length) {
+        container.innerHTML = `<div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <h3>Ainda sem candidaturas</h3>
+          <p>Publique a sua primeira vaga para começar a receber candidatos.</p>
+          <button class="btn btn--primary" style="margin-top:16px" onclick="showPage('publicar')">Publicar Vaga</button>
+        </div>`;
+        return;
+      }
+      container.innerHTML = recent.map(app => {
+        const job  = getJobById(app.jobId);
+        const cand = getUserById(app.colaboradorId);
+        if (!job || !cand) return '';
+        return `<div class="applicant-card" style="margin-bottom:10px">
+          <div class="avatar" style="width:44px;height:44px;font-size:15px">${cand.avatar || '?'}</div>
+          <div class="applicant-card__info">
+            <div class="applicant-card__name">${cand.name} ${cand.surname || ''}</div>
+            <div class="applicant-card__role">${cand.role || 'Sem cargo definido'}</div>
+            <div class="applicant-card__meta">📋 ${job.title} · 📅 ${formatDate(app.appliedAt)}</div>
+          </div>
+          <div class="applicant-card__actions">
+            ${statusBadge(app.status)}
+            <button class="btn btn--primary btn--sm" onclick="openCandidateModal('${app.id}')">Ver Perfil</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    /* =============================================
+       VAGAS (JOB LIST)
+       ============================================= */
+    function renderJobs() {
+      const jobs = getJobsByCompany(currentUser.id);
+      const container = document.getElementById('jobsList');
+      if (!jobs.length) {
+        container.innerHTML = `<div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          <h3>Ainda não publicou nenhuma vaga</h3>
+          <p>Clique em "Nova Vaga" para começar.</p>
+        </div>`;
+        return;
+      }
+      container.innerHTML = jobs.map(job => {
+        const apps    = getApplicationsByJob(job.id);
+        const pending = apps.filter(a => a.status === 'pendente').length;
+        const isActive = job.status === 'active';
+        return `<div class="job-manage-card">
+          <div class="avatar avatar--company" style="width:44px;height:44px;font-size:14px;border-radius:10px;flex-shrink:0">${currentUser.avatar || '??'}</div>
+          <div class="job-manage-card__info">
+            <div class="job-manage-card__badges">
+              ${job.featured ? '<span class="featured-badge">⭐ Destaque</span>' : ''}
+              <span class="status-badge ${isActive ? 'status--accepted' : 'status--rejected'}">${isActive ? 'Activa' : 'Fechada'}</span>
+            </div>
+            <div class="job-manage-card__title">${job.title}</div>
+            <div class="job-manage-card__meta">
+              <span>📍 ${job.location}</span>
+              <span>💼 ${job.type}</span>
+              ${job.salary ? `<span>💰 ${job.salary}</span>` : ''}
+              <span>📅 ${daysAgo(job.posted)}</span>
+            </div>
+            <div class="job-manage-card__stats">
+              ${apps.length} candidatura${apps.length !== 1 ? 's' : ''}
+              ${pending ? ` · <span style="color:var(--orange);font-weight:600">${pending} pendente${pending !== 1 ? 's' : ''}</span>` : ''}
+            </div>
+          </div>
+          <div class="job-manage-card__actions">
+            <button class="btn btn--primary btn--sm" onclick="viewApplicants('${job.id}')">
+              Candidatos (${apps.length})
+            </button>
+            <button class="btn btn--ghost btn--sm" onclick="editJob('${job.id}')">Editar</button>
+            <button class="btn btn--ghost btn--sm" onclick="toggleJobStatus('${job.id}')" style="font-size:12px;color:${isActive ? '#dc2626' : '#059669'}">
+              ${isActive ? 'Fechar Vaga' : 'Reabrir Vaga'}
+            </button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function toggleJobStatus(jobId) {
+      const job = getJobById(jobId);
+      if (!job) return;
+      const newStatus = job.status === 'active' ? 'closed' : 'active';
+      updateJob(jobId, { status: newStatus });
+
+      // Notificar todos os candidatos quando a vaga é fechada
+      if (newStatus === 'closed') {
+        const apps = getApplicationsByJob(jobId);
+        apps.forEach(app => {
+          addNotification(
+            app.colaboradorId,
+            'job_closed',
+            'Vaga encerrada',
+            `A vaga "${job.title}" em ${job.companyName} foi encerrada. ${app.status === 'aceite' ? 'A sua candidatura foi aceite!' : app.status === 'rejeitado' ? 'A sua candidatura não foi seleccionada.' : 'Não haverá mais actualizações sobre esta candidatura.'}`,
+            ''
+          );
+        });
+      }
+
+      showToast(newStatus === 'active' ? 'Vaga reaberta!' : 'Vaga fechada. Candidatos notificados.', 'success');
+      renderJobs();
+    }
+
+    function editJob(jobId) {
+      const job = getJobById(jobId);
+      if (!job) return;
+      // Pre-fill form
+      document.getElementById('jEditId').value       = job.id;
+      document.getElementById('jTitle').value        = job.title;
+      document.getElementById('jLocation').value     = job.location;
+      document.getElementById('jType').value         = job.type;
+      document.getElementById('jExperience').value   = job.experience || '';
+      document.getElementById('jSalaryMin').value    = job.salaryMin || '';
+      document.getElementById('jSalaryMax').value    = job.salaryMax || '';
+      document.getElementById('jTags').value         = (job.tags || []).join(', ');
+      document.getElementById('jDescription').value  = job.description;
+      document.getElementById('jFeatured').checked   = !!job.featured;
+
+      // Screening questions
+      screeningQs = (job.screeningQuestions || []).map(q => ({ ...q }));
+      renderScreeningBuilder();
+
+      document.getElementById('publishPageTitle').textContent = 'Editar Vaga';
+      document.getElementById('publishPageSub').textContent   = 'Actualizar os detalhes da posição';
+      document.getElementById('publishSubmitBtn').innerHTML   = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Guardar Alterações`;
+
+      // Navigate
+      document.querySelectorAll('.dash-page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.dash-nav-link').forEach(l => l.classList.remove('active'));
+      document.getElementById('pagePublicar').classList.add('active');
+      document.getElementById('navPublicar').classList.add('active');
+    }
+
+    function cancelPublish() {
+      resetJobForm();
+      showPage('vagas');
+    }
+
+    /* =============================================
+       APPLICANTS VIEW
+       ============================================= */
+    function viewApplicants(jobId) {
+      currentViewJobId = jobId;
+      const job = getJobById(jobId);
+      document.getElementById('applicantsJobTitle').textContent = job.title;
+      document.getElementById('applicantsJobMeta').textContent  = `${job.location} · ${job.type}${job.salary ? ' · ' + job.salary : ''}`;
+      document.getElementById('vagasListView').classList.add('hidden');
+      document.getElementById('applicantsView').classList.remove('hidden');
+      document.getElementById('filterApplicantStatus').value = '';
+      renderApplicants();
+    }
+
+    function backToJobs() {
+      currentViewJobId = null;
+      document.getElementById('vagasListView').classList.remove('hidden');
+      document.getElementById('applicantsView').classList.add('hidden');
+    }
+
+    function renderApplicants() {
+      const filterStatus = document.getElementById('filterApplicantStatus').value;
+      let apps = getApplicationsByJob(currentViewJobId);
+      if (filterStatus) apps = apps.filter(a => a.status === filterStatus);
+      apps.sort((a, b) => new Date(b.appliedAt) - new Date(a.appliedAt));
+
+      const container = document.getElementById('applicantsList');
+      if (!apps.length) {
+        container.innerHTML = `<div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <h3>${filterStatus ? 'Nenhum candidato neste estado' : 'Ainda sem candidatos'}</h3>
+        </div>`;
+        return;
+      }
+
+      container.innerHTML = apps.map(app => {
+        const cand = getUserById(app.colaboradorId);
+        if (!cand) return '';
+        const interview = getInterviewByApp(app.id);
+        const unread = getMessagesByApp(app.id).filter(m => !m.read && m.senderType !== 'empresa').length;
+        return `<div class="applicant-card">
+          <div class="avatar" style="width:48px;height:48px;font-size:16px;flex-shrink:0">${cand.avatar || '?'}</div>
+          <div class="applicant-card__info">
+            <div class="applicant-card__name">${cand.name} ${cand.surname || ''}</div>
+            <div class="applicant-card__role">${cand.role || 'Sem cargo definido'} · ${cand.location || '—'}</div>
+            <div class="applicant-card__meta">
+              Candidatura: ${formatDate(app.appliedAt)}
+              ${cand.skills && cand.skills.length ? ` · ${cand.skills.slice(0,3).join(', ')}` : ''}
+              ${interview ? ` · 📅 Entrevista ${formatDate(interview.proposedDate)}` : ''}
+            </div>
+          </div>
+          <div class="applicant-card__actions">
+            ${statusBadge(app.status)}
+            <select class="status-select" onchange="changeAppStatus('${app.id}', this.value)">
+              <option value="pendente"   ${app.status==='pendente'   ?'selected':''}>Pendente</option>
+              <option value="em_analise" ${app.status==='em_analise' ?'selected':''}>Em Análise</option>
+              <option value="aceite"     ${app.status==='aceite'     ?'selected':''}>Aceite</option>
+              <option value="rejeitado"  ${app.status==='rejeitado'  ?'selected':''}>Rejeitado</option>
+            </select>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn--primary btn--sm" onclick="openCandidateModal('${app.id}')">Ver Perfil</button>
+              <button class="btn btn--ghost btn--sm" style="position:relative" onclick="openMsgFromApp('${app.id}')">
+                ✉
+                ${unread ? `<span style="position:absolute;top:-4px;right:-4px;background:#ef4444;color:white;font-size:9px;font-weight:700;min-width:14px;height:14px;border-radius:7px;display:flex;align-items:center;justify-content:center;padding:0 3px">${unread}</span>` : ''}
+              </button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function changeAppStatus(appId, newStatus) {
+      const notes = { aceite: 'Parabéns! O vosso perfil correspondeu ao que procuramos.', rejeitado: 'Obrigado pelo interesse. Neste momento seleccionámos outro perfil.' };
+      updateApplicationStatus(appId, newStatus, notes[newStatus] || '');
+      showToast(`Estado actualizado: ${STATUS_LABELS[newStatus].label}`, 'success');
+      loadDashboard();
+      if (currentViewJobId) renderApplicants();
+    }
+
+    function openMsgFromApp(appId) {
+      showPage('mensagens');
+      setTimeout(() => openChatThread(appId), 50);
+    }
+
+    /* =============================================
+       CANDIDATE PROFILE MODAL
+       ============================================= */
+    function openCandidateModal(appId) {
+      const app  = getApplicationById(appId);
+      if (!app) return;
+      const cand = getUserById(app.colaboradorId);
+      const job  = getJobById(app.jobId);
+      const cv   = getCV(app.colaboradorId);
+      if (!cand) return;
+
+      const jobSQs = (job && job.screeningQuestions) ? job.screeningQuestions : [];
+      const answers = app.screeningAnswers || {};
+      const interview = getInterviewByApp(appId);
+      const notes = getNotes(appId);
+
+      document.getElementById('profileModalContent').innerHTML = `
+        <!-- Status bar -->
+        <div class="status-action-bar">
+          <label>Estado:</label>
+          <select class="status-select" id="modalStatusSelect">
+            <option value="pendente"   ${app.status==='pendente'   ?'selected':''}>⏳ Pendente</option>
+            <option value="em_analise" ${app.status==='em_analise' ?'selected':''}>🔍 Em Análise</option>
+            <option value="aceite"     ${app.status==='aceite'     ?'selected':''}>✓ Aceite</option>
+            <option value="rejeitado"  ${app.status==='rejeitado'  ?'selected':''}>✗ Rejeitado</option>
+          </select>
+          <input type="text" id="modalNote" placeholder="Mensagem para o candidato..."
+            value="${(app.note || '').replace(/"/g,'&quot;')}"
+            style="flex:1;min-width:120px;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;outline:none" />
+          <button class="btn btn--primary btn--sm" onclick="saveModalStatus('${appId}')">Guardar</button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="modal-tabs">
+          <button class="modal-tab active" onclick="switchModalTab(this,'mtPerfil')">Perfil</button>
+          <button class="modal-tab" onclick="switchModalTab(this,'mtTriagem')">Triagem ${jobSQs.length ? `(${jobSQs.length})` : ''}</button>
+          <button class="modal-tab" onclick="switchModalTab(this,'mtEntrevista')">Entrevista</button>
+          <button class="modal-tab" onclick="switchModalTab(this,'mtNotas')">Notas ${notes.length ? `(${notes.length})` : ''}</button>
+        </div>
+
+        <!-- TAB: PERFIL -->
+        <div class="modal-tab-pane active" id="mtPerfil">
+          <div class="profile-view__header">
+            <div class="avatar" style="width:60px;height:60px;font-size:20px;flex-shrink:0">${cand.avatar || '?'}</div>
+            <div class="profile-view__meta">
+              <h2>${cand.name} ${cand.surname || ''}</h2>
+              <div class="role">${cand.role || 'Sem cargo definido'}</div>
+              <div class="contacts">
+                ${cand.location ? `<span>📍 ${cand.location}</span>` : ''}
+                ${cand.email    ? `<span>✉️ ${cand.email}</span>`    : ''}
+                ${cand.phone    ? `<span>📞 ${cand.phone}</span>`    : ''}
+              </div>
+            </div>
+          </div>
+
+          ${cand.about ? `<div class="profile-view__section"><h3>Sobre</h3><p style="font-size:14px;color:var(--dark-2);line-height:1.75">${cand.about}</p></div>` : ''}
+
+          ${cand.skills && cand.skills.length ? `<div class="profile-view__section">
+            <h3>Competências</h3>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              ${cand.skills.map(s => `<span style="font-size:12px;padding:4px 12px;border-radius:20px;background:var(--blue-light);color:var(--blue);font-weight:500">${s}</span>`).join('')}
+            </div></div>` : ''}
+
+          ${cand.experience && cand.experience.length ? `<div class="profile-view__section"><h3>Experiência Profissional</h3>
+            ${cand.experience.map(exp => `<div class="exp-view">
+              <div class="exp-view__title">${exp.role}</div>
+              <div class="exp-view__company">${exp.company}</div>
+              <div class="exp-view__period">${exp.period}</div>
+              ${exp.desc ? `<div class="exp-view__desc">${exp.desc}</div>` : ''}
+            </div>`).join('')}</div>` : ''}
+
+          ${cand.education && cand.education.length ? `<div class="profile-view__section"><h3>Educação</h3>
+            ${cand.education.map(edu => `<div class="exp-view">
+              <div class="exp-view__title">${edu.degree}</div>
+              <div class="exp-view__company">${edu.school}</div>
+              <div class="exp-view__period">${edu.year}</div>
+            </div>`).join('')}</div>` : ''}
+
+          <div class="profile-view__section"><h3>Curriculum Vitae</h3>
+            ${cv ? `<div class="cv-download-btn" onclick="downloadCandidateCV('${cand.id}')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div><span>${cv.name}</span><br><small>${(cv.size/1024).toFixed(0)} KB · ${formatDate(cv.uploadedAt)}</small></div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto;width:18px;height:18px;color:var(--blue)"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </div>` : `<div style="font-size:13px;color:var(--gray);padding:12px;background:var(--gray-light);border-radius:var(--radius)">O candidato ainda não carregou o CV.</div>`}
+          </div>
+
+          <div style="font-size:12px;color:var(--gray);padding-top:14px;border-top:1px solid var(--border)">
+            Candidatura para <strong>${job ? job.title : '—'}</strong> · ${formatDate(app.appliedAt)}
+          </div>
+        </div>
+
+        <!-- TAB: TRIAGEM -->
+        <div class="modal-tab-pane" id="mtTriagem">
+          ${!jobSQs.length ? `<div style="font-size:14px;color:var(--gray);padding:20px 0">Esta vaga não tem perguntas de triagem.</div>`
+          : jobSQs.map(q => `<div class="screening-answer">
+              <div class="screening-answer__q">${q.question}</div>
+              <div class="screening-answer__a">${answers[q.id] || '<em style="color:var(--gray)">Sem resposta</em>'}</div>
+            </div>`).join('')}
+        </div>
+
+        <!-- TAB: ENTREVISTA -->
+        <div class="modal-tab-pane" id="mtEntrevista">
+          ${interview ? `
+          <div class="interview-info" style="margin-bottom:20px">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#059669;margin-bottom:10px">
+              Entrevista Agendada · <span style="text-transform:none;font-weight:600">${interview.status === 'confirmado' ? '✓ Confirmada' : interview.status === 'cancelado' ? '✗ Cancelada' : '⏳ Aguarda confirmação'}</span>
+            </div>
+            <div class="interview-info__row">
+              <div class="interview-info__item"><div class="interview-info__label">Data</div><div class="interview-info__val">${formatDate(interview.proposedDate)}</div></div>
+              <div class="interview-info__item"><div class="interview-info__label">Hora</div><div class="interview-info__val">${interview.time}</div></div>
+              <div class="interview-info__item"><div class="interview-info__label">Formato</div><div class="interview-info__val">${interview.format}</div></div>
+              <div class="interview-info__item"><div class="interview-info__label">Local / Link</div><div class="interview-info__val">${interview.location || '—'}</div></div>
+            </div>
+            ${interview.note ? `<div style="margin-top:10px;font-size:13px;color:var(--dark-2)">${interview.note}</div>` : ''}
+          </div>
+          <div style="font-size:13px;font-weight:600;color:var(--dark);margin-bottom:12px">Actualizar entrevista</div>` : `<div style="font-size:13px;font-weight:600;color:var(--dark);margin-bottom:14px">Agendar entrevista</div>`}
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div><label style="font-size:12px;font-weight:600;color:var(--dark);display:block;margin-bottom:4px">Data *</label>
+            <input type="date" id="intDate" value="${interview ? interview.proposedDate : ''}" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;outline:none" /></div>
+            <div><label style="font-size:12px;font-weight:600;color:var(--dark);display:block;margin-bottom:4px">Hora *</label>
+            <input type="time" id="intTime" value="${interview ? interview.time : ''}" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;outline:none" /></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div><label style="font-size:12px;font-weight:600;color:var(--dark);display:block;margin-bottom:4px">Formato</label>
+            <select id="intFormat" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;outline:none;background:var(--white)">
+              <option ${interview && interview.format==='Videochamada' ? 'selected':''}>Videochamada</option>
+              <option ${interview && interview.format==='Presencial' ? 'selected':''}>Presencial</option>
+              <option ${interview && interview.format==='Telefone' ? 'selected':''}>Telefone</option>
+            </select></div>
+            <div><label style="font-size:12px;font-weight:600;color:var(--dark);display:block;margin-bottom:4px">Local / Link</label>
+            <input type="text" id="intLocation" value="${interview ? interview.location || '' : ''}" placeholder="Google Meet, Zoom, morada..." style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;outline:none" /></div>
+          </div>
+          <div style="margin-bottom:14px"><label style="font-size:12px;font-weight:600;color:var(--dark);display:block;margin-bottom:4px">Nota para o candidato</label>
+          <textarea id="intNote" rows="3" placeholder="ex: Entrevista técnica com o líder de equipa e o gestor de produto..." style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;outline:none;resize:vertical">${interview ? interview.note || '' : ''}</textarea></div>
+          <button class="btn btn--primary btn--sm" onclick="saveInterview('${appId}')">
+            ${interview ? 'Actualizar Entrevista' : 'Agendar Entrevista'}
+          </button>
+        </div>
+
+        <!-- TAB: NOTAS -->
+        <div class="modal-tab-pane" id="mtNotas">
+          <div id="notesList_${appId}">
+            ${notes.length ? notes.map(n => `<div class="note-item">
+              <div class="note-item__text">${n.text}</div>
+              <div class="note-item__meta">${n.authorName} · ${formatDateTime(n.date)}</div>
+            </div>`).join('') : '<div style="font-size:13px;color:var(--gray);margin-bottom:12px">Ainda sem notas internas.</div>'}
+          </div>
+          <div class="note-add-area">
+            <textarea id="noteInput_${appId}" placeholder="Adicionar nota interna (apenas visível pela empresa)..."></textarea>
+            <button class="btn btn--primary btn--sm" onclick="addNoteToApp('${appId}')" style="align-self:flex-end">Adicionar</button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('profileModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function switchModalTab(btn, paneId) {
+      btn.closest('.modal').querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      btn.closest('.modal').querySelectorAll('.modal-tab-pane').forEach(p => p.classList.remove('active'));
+      document.getElementById(paneId).classList.add('active');
+    }
+
+    function saveModalStatus(appId) {
+      const status = document.getElementById('modalStatusSelect').value;
+      const note   = document.getElementById('modalNote').value.trim();
+      updateApplicationStatus(appId, status, note);
+      showToast(`Estado actualizado: ${STATUS_LABELS[status].label}`, 'success');
+      loadDashboard();
+      if (currentViewJobId) renderApplicants();
+      closeProfileModal();
+    }
+
+    function saveInterview(appId) {
+      const date     = document.getElementById('intDate').value;
+      const time     = document.getElementById('intTime').value;
+      const format   = document.getElementById('intFormat').value;
+      const location = document.getElementById('intLocation').value.trim();
+      const note     = document.getElementById('intNote').value.trim();
+      if (!date || !time) { showToast('Preencha data e hora.', 'error'); return; }
+      scheduleInterview({ appId, proposedDate: date, time, format, location, note });
+      showToast('Entrevista agendada com sucesso!', 'success');
+      // Re-open modal to refresh
+      closeProfileModal();
+      setTimeout(() => openCandidateModal(appId), 100);
+    }
+
+    function downloadCandidateCV(userId) {
+      const cv = getCV(userId);
+      if (!cv) return;
+      const a = document.createElement('a');
+      a.href = cv.dataUrl;
+      a.download = cv.name;
+      a.click();
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profileModal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    /* =============================================
+       INTERNAL NOTES
+       ============================================= */
+    function getNotes(appId) {
+      try { return JSON.parse(localStorage.getItem('pc_notes_' + appId)) || []; } catch { return []; }
+    }
+    function saveNotes(appId, notes) {
+      localStorage.setItem('pc_notes_' + appId, JSON.stringify(notes));
+    }
+    function addNoteToApp(appId) {
+      const input = document.getElementById('noteInput_' + appId);
+      const text  = input.value.trim();
+      if (!text) return;
+      const notes = getNotes(appId);
+      notes.push({ id: 'n' + Date.now(), text, authorName: currentUser.companyName || 'RH', date: new Date().toISOString() });
+      saveNotes(appId, notes);
+      input.value = '';
+      // Refresh notes list
+      document.getElementById('notesList_' + appId).innerHTML = notes.map(n => `<div class="note-item">
+        <div class="note-item__text">${n.text}</div>
+        <div class="note-item__meta">${n.authorName} · ${formatDateTime(n.date)}</div>
+      </div>`).join('');
+      showToast('Nota adicionada.', 'success');
+    }
+
+    /* =============================================
+       PUBLISH / EDIT JOB
+       ============================================= */
+    const JOB_TEMPLATES = {
+      software: {
+        title: 'Engenheiro(a) de Software', type: 'Full-time', experience: 'Pleno (2-5 anos)',
+        tags: 'JavaScript, React, Node.js, Git',
+        description: 'Estamos à procura de um(a) Engenheiro(a) de Software apaixonado(a) por criar produtos digitais de qualidade.\n\nResponsabilidades:\n• Desenvolvimento de funcionalidades front-end e back-end\n• Participação em code reviews\n• Colaboração com designers e product managers\n• Manutenção e melhoria de sistemas existentes\n\nRequisitos:\n• Experiência com JavaScript (React ou Vue)\n• Conhecimentos de Node.js ou equivalente\n• Boas práticas de versionamento (Git)\n\nO que oferecemos:\n• Trabalho remoto parcial\n• Plano de formação anual\n• Seguro de saúde',
+        screeningQuestions: [
+          { question: 'Quantos anos de experiência tem com desenvolvimento web?', type: 'text' },
+          { question: 'Tem experiência com cloud (AWS, GCP ou Azure)?', type: 'yesno' },
+        ],
+      },
+      designer: {
+        title: 'Designer UX/UI', type: 'Full-time', experience: 'Pleno (2-5 anos)',
+        tags: 'Figma, UX Research, Design System, Prototipagem',
+        description: 'Procuramos um(a) Designer UX/UI para integrar a nossa equipa de produto.\n\nResponsabilidades:\n• Design de interfaces web e mobile\n• Condução de sessões de user research\n• Criação e manutenção do design system\n• Prototipagem e testes de usabilidade\n\nRequisitos:\n• Experiência com Figma ou Adobe XD\n• Portfólio demonstrativo\n• Mindset centrado no utilizador\n\nO que oferecemos:\n• Equipamento de trabalho\n• Horário flexível\n• Ambiente criativo',
+        screeningQuestions: [{ question: 'Partilhe o link do seu portfólio ou Behance.', type: 'text' }],
+      },
+      data: {
+        title: 'Analista de Dados', type: 'Full-time', experience: 'Pleno (2-5 anos)',
+        tags: 'Python, SQL, Power BI, Excel',
+        description: 'Oportunidade para um(a) Analista de Dados apaixonado(a) por transformar dados em decisões.\n\nResponsabilidades:\n• Análise exploratória de dados\n• Construção de dashboards e relatórios\n• Automatização de processos de reporte\n• Comunicação de insights a stakeholders\n\nRequisitos:\n• Domínio de SQL e Python\n• Experiência com BI (Power BI, Tableau ou similar)\n• Pensamento analítico e atenção ao detalhe',
+        screeningQuestions: [
+          { question: 'Tem experiência com Power BI ou Tableau?', type: 'yesno' },
+          { question: 'Descreva um projecto de dados em que teve impacto mensurável.', type: 'text' },
+        ],
+      },
+      pm: {
+        title: 'Product Manager', type: 'Full-time', experience: 'Sénior (5+ anos)',
+        tags: 'Product Strategy, Agile, Analytics, Roadmap',
+        description: 'Procuramos um(a) Product Manager para liderar o nosso roadmap de produto.\n\nResponsabilidades:\n• Definição e priorização do roadmap\n• Gestão de stakeholders internos e externos\n• Análise de dados e métricas de produto\n• Colaboração com engenharia, design e negócio\n\nRequisitos:\n• Experiência em gestão de produto\n• Metodologias ágeis (Scrum/Kanban)\n• Orientação para dados e resultados',
+        screeningQuestions: [{ question: 'Descreva um produto que lançou e o impacto que teve.', type: 'text' }],
+      },
+      marketing: {
+        title: 'Gestor(a) de Marketing Digital', type: 'Full-time', experience: 'Pleno (2-5 anos)',
+        tags: 'SEO, Google Ads, Social Media, Analytics',
+        description: 'Estamos à procura de um(a) Gestor(a) de Marketing Digital para impulsionar a nossa presença online.\n\nResponsabilidades:\n• Gestão de campanhas pagas (Google Ads, Meta)\n• Estratégia de SEO e conteúdo\n• Análise de performance e reporting\n• Gestão de redes sociais\n\nRequisitos:\n• Experiência em marketing digital\n• Conhecimento de ferramentas de analytics\n• Criatividade e orientação para resultados',
+        screeningQuestions: [{ question: 'Tem certificação Google Ads ou Meta Blueprint?', type: 'yesno' }],
+      },
+      ops: {
+        title: 'Operations Manager', type: 'Full-time', experience: 'Sénior (5+ anos)',
+        tags: 'Operações, Processos, KPIs, Liderança',
+        description: 'Procuramos um(a) Operations Manager para optimizar os nossos processos operacionais.\n\nResponsabilidades:\n• Gestão e optimização de processos internos\n• Liderança de equipa operacional\n• Definição e monitorização de KPIs\n• Identificação de oportunidades de melhoria\n\nRequisitos:\n• Experiência em gestão de operações\n• Competências de liderança\n• Mentalidade data-driven',
+        screeningQuestions: [],
+      },
+    };
+
+    function applyTemplate() {
+      const key = document.getElementById('templateSelect').value;
+      if (!key || !JOB_TEMPLATES[key]) return;
+      const t = JOB_TEMPLATES[key];
+      document.getElementById('jTitle').value       = t.title;
+      document.getElementById('jType').value        = t.type;
+      document.getElementById('jExperience').value  = t.experience;
+      document.getElementById('jTags').value        = t.tags;
+      document.getElementById('jDescription').value = t.description;
+      screeningQs = t.screeningQuestions.map((q, i) => ({ id: 'sq_new_' + i, ...q }));
+      renderScreeningBuilder();
+    }
+
+    function addScreeningQuestion() {
+      screeningQs.push({ id: 'sq_' + Date.now(), question: '', type: 'text' });
+      renderScreeningBuilder();
+    }
+
+    function removeScreeningQuestion(idx) {
+      screeningQs.splice(idx, 1);
+      renderScreeningBuilder();
+    }
+
+    function renderScreeningBuilder() {
+      const container = document.getElementById('screeningQuestionsList');
+      if (!screeningQs.length) {
+        container.innerHTML = '<div style="font-size:13px;color:var(--gray);padding:8px 0">Nenhuma pergunta de triagem adicionada.</div>';
+        return;
+      }
+      container.innerHTML = screeningQs.map((q, i) => `
+        <div class="sq-builder-item">
+          <input type="text" placeholder="Pergunta de triagem..." value="${q.question.replace(/"/g,'&quot;')}"
+            oninput="screeningQs[${i}].question = this.value" />
+          <select onchange="screeningQs[${i}].type = this.value">
+            <option value="text" ${q.type==='text'?'selected':''}>Texto livre</option>
+            <option value="yesno" ${q.type==='yesno'?'selected':''}>Sim / Não</option>
+          </select>
+          <button type="button" onclick="removeScreeningQuestion(${i})" title="Remover">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+          </button>
+        </div>`).join('');
+    }
+
+    function resetJobForm() {
+      document.getElementById('jobForm').reset();
+      document.getElementById('jEditId').value = '';
+      document.getElementById('jobFormAlert').innerHTML = '';
+      document.getElementById('publishPageTitle').textContent = 'Publicar Nova Vaga';
+      document.getElementById('publishPageSub').textContent   = 'Preencha os detalhes da posição que pretende divulgar';
+      document.getElementById('publishSubmitBtn').innerHTML   = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg> Publicar Vaga`;
+      document.getElementById('templateSelect').value = '';
+      screeningQs = [];
+      renderScreeningBuilder();
+    }
+
+    function handlePublishJob(e) {
+      e.preventDefault();
+      const title       = document.getElementById('jTitle').value.trim();
+      const location    = document.getElementById('jLocation').value.trim();
+      const type        = document.getElementById('jType').value;
+      const experience  = document.getElementById('jExperience').value;
+      const salaryMin   = parseInt(document.getElementById('jSalaryMin').value) || 0;
+      const salaryMax   = parseInt(document.getElementById('jSalaryMax').value) || 0;
+      const tagsRaw     = document.getElementById('jTags').value.trim();
+      const description = document.getElementById('jDescription').value.trim();
+      const featured    = document.getElementById('jFeatured').checked;
+      const editId      = document.getElementById('jEditId').value;
+
+      if (!description) {
+        document.getElementById('jobFormAlert').innerHTML =
+          '<div class="alert alert--error">Por favor preencha a descrição da vaga.</div>';
+        return;
+      }
+
+      const tags   = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+      let salary   = '';
+      if (salaryMin && salaryMax) salary = `${salaryMin.toLocaleString('pt-PT')} – ${salaryMax.toLocaleString('pt-PT')} €/mês`;
+      else if (salaryMin) salary = `A partir de ${salaryMin.toLocaleString('pt-PT')} €/mês`;
+      else if (salaryMax) salary = `Até ${salaryMax.toLocaleString('pt-PT')} €/mês`;
+
+      const filteredSQs = screeningQs.filter(q => q.question.trim());
+      const jobData = {
+        companyId: currentUser.id, companyName: currentUser.companyName,
+        companyAvatar: currentUser.avatar || (currentUser.companyName || '').slice(0,2).toUpperCase(),
+        title, location, type, experience, salary, salaryMin, salaryMax,
+        tags, description, featured, screeningQuestions: filteredSQs,
+      };
+
+      if (editId) {
+        updateJob(editId, jobData);
+        showToast('Vaga actualizada com sucesso!', 'success');
+      } else {
+        createJob(jobData);
+        showToast('Vaga publicada com sucesso!', 'success');
+      }
+      resetJobForm();
+      showPage('vagas');
+    }
+
+    /* =============================================
+       MESSAGES
+       ============================================= */
+    function loadMessages() {
+      const myJobs = getJobsByCompany(currentUser.id);
+      const allApps = myJobs.flatMap(j => getApplicationsByJob(j.id));
+      const threads = allApps.filter(app => {
+        const msgs = getMessagesByApp(app.id);
+        return msgs.length > 0 || true; // show all active apps
+      });
+
+      const container = document.getElementById('msgThreadList');
+      if (!threads.length) {
+        container.innerHTML = '<div style="padding:20px;font-size:13px;color:var(--gray);text-align:center">Sem conversas ainda.</div>';
+        return;
+      }
+
+      container.innerHTML = threads.map(app => {
+        const cand    = getUserById(app.colaboradorId);
+        const job     = getJobById(app.jobId);
+        const msgs    = getMessagesByApp(app.id);
+        const last    = msgs[msgs.length - 1];
+        const unread  = msgs.filter(m => !m.read && m.senderType !== 'empresa').length;
+        if (!cand) return '';
+        return `<div class="msg-thread-item ${currentMsgAppId === app.id ? 'active' : ''}" onclick="openChatThread('${app.id}')" style="padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:var(--transition);${currentMsgAppId === app.id ? 'background:var(--blue-pale)' : ''}">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="position:relative;flex-shrink:0">
+              <div class="avatar" style="width:38px;height:38px;font-size:13px">${cand.avatar || '?'}</div>
+              ${unread ? `<span style="position:absolute;top:-3px;right:-3px;background:#ef4444;color:white;font-size:9px;font-weight:700;min-width:14px;height:14px;border-radius:7px;display:flex;align-items:center;justify-content:center;padding:0 2px">${unread}</span>` : ''}
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+                <div style="font-size:13px;font-weight:${unread ? '700' : '600'};color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${cand.name} ${cand.surname || ''}</div>
+                ${last ? `<div style="font-size:11px;color:var(--gray);flex-shrink:0">${formatDateTime(last.date).split(',')[0]}</div>` : ''}
+              </div>
+              <div style="font-size:12px;color:var(--gray);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${job ? job.title : '—'}</div>
+              ${last ? `<div style="font-size:12px;color:var(--gray);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px">${last.senderType === 'empresa' ? 'Eu: ' : ''}${last.content}</div>` : ''}
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function openChatThread(appId) {
+      currentMsgAppId = appId;
+      markMessagesRead(appId, 'empresa');
+      updateNavBadge();
+      loadMessages(); // refresh thread list
+
+      const app  = getApplicationById(appId);
+      const cand = getUserById(app ? app.colaboradorId : null);
+      const job  = getJobById(app ? app.jobId : null);
+      if (!app || !cand) return;
+
+      const panel = document.getElementById('msgChatPanel');
+      panel.style.display = 'flex';
+      panel.style.flexDirection = 'column';
+
+      renderChatPanel(appId, cand, job);
+
+      if (msgPollTimer) clearInterval(msgPollTimer);
+      msgPollTimer = setInterval(() => {
+        if (currentMsgAppId === appId) {
+          markMessagesRead(appId, 'empresa');
+          updateNavBadge();
+          refreshChatMessages(appId);
+        }
+      }, 3000);
+    }
+
+    function renderChatPanel(appId, cand, job) {
+      const panel = document.getElementById('msgChatPanel');
+      panel.innerHTML = `
+        <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+          <div class="avatar" style="width:38px;height:38px;font-size:13px">${cand.avatar || '?'}</div>
+          <div>
+            <div style="font-size:14px;font-weight:700">${cand.name} ${cand.surname || ''}</div>
+            <div style="font-size:12px;color:var(--gray)">${job ? job.title : '—'}</div>
+          </div>
+          <button class="btn btn--ghost btn--sm" style="margin-left:auto" onclick="openCandidateModal('${appId}')">Ver Perfil</button>
+        </div>
+        <div class="chat-container" id="chatMessages_${appId}" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px"></div>
+        <div style="padding:12px 16px;border-top:1px solid var(--border)" class="chat-input-row">
+          <input type="text" id="chatInput_${appId}" placeholder="Escrever mensagem..."
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMsg('${appId}')}" />
+          <button class="btn btn--primary btn--sm" onclick="sendChatMsg('${appId}')">Enviar</button>
+        </div>`;
+      refreshChatMessages(appId);
+    }
+
+    function refreshChatMessages(appId) {
+      const container = document.getElementById('chatMessages_' + appId);
+      if (!container) return;
+      const msgs = getMessagesByApp(appId);
+      const wasAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 50;
+      container.innerHTML = msgs.map(m => {
+        const isOut = m.senderType === 'empresa';
+        return `<div class="chat-bubble ${isOut ? 'chat-bubble--out' : 'chat-bubble--in'}">
+          ${m.content}
+          <div style="font-size:10px;opacity:.6;margin-top:3px;text-align:right">${formatDateTime(m.date)}</div>
+        </div>`;
+      }).join('');
+      if (!msgs.length) container.innerHTML = '<div style="text-align:center;font-size:13px;color:var(--gray);padding:20px">Sem mensagens. Inicie a conversa!</div>';
+      if (wasAtBottom || msgs.length <= 3) container.scrollTop = container.scrollHeight;
+    }
+
+    function sendChatMsg(appId) {
+      const input = document.getElementById('chatInput_' + appId);
+      const text  = input.value.trim();
+      if (!text) return;
+      sendMessage(appId, currentUser.id, 'empresa', text);
+      input.value = '';
+      refreshChatMessages(appId);
+    }
+
+    /* =============================================
+       REPORTS
+       ============================================= */
+    function loadReports() {
+      const myJobs = getJobsByCompany(currentUser.id);
+
+      // Populate year dropdown
+      const years = [...new Set(myJobs.map(j => j.createdAt ? new Date(j.createdAt).getFullYear() : null).filter(Boolean))].sort((a,b) => b-a);
+      const yearSel = document.getElementById('rfYear');
+      yearSel.innerHTML = '<option value="">Todos</option>' + years.map(y => `<option value="${y}">${y}</option>`).join('');
+
+      // Populate job dropdown
+      const jobSel = document.getElementById('rfJob');
+      jobSel.innerHTML = '<option value="">Todas as vagas</option>' + myJobs.map(j => `<option value="${j.id}">${j.title}</option>`).join('');
+
+      // Initial render (no filters)
+      renderReports(myJobs, myJobs.flatMap(j => getApplicationsByJob(j.id)));
+    }
+
+    function syncDateFromYear() {
+      const year = document.getElementById('rfYear').value;
+      if (year) {
+        document.getElementById('rfDateFrom').value = `${year}-01-01`;
+        document.getElementById('rfDateTo').value   = `${year}-12-31`;
+      } else {
+        document.getElementById('rfDateFrom').value = '';
+        document.getElementById('rfDateTo').value   = '';
+      }
+    }
+
+    function applyReportFilters() {
+      let jobs = getJobsByCompany(currentUser.id);
+      const dateFrom = document.getElementById('rfDateFrom').value;
+      const dateTo   = document.getElementById('rfDateTo').value;
+      const jobId    = document.getElementById('rfJob').value;
+      const hired    = document.getElementById('rfHired').value;
+
+      if (dateFrom) jobs = jobs.filter(j => j.createdAt && new Date(j.createdAt) >= new Date(dateFrom));
+      if (dateTo)   jobs = jobs.filter(j => j.createdAt && new Date(j.createdAt) <= new Date(dateTo + 'T23:59:59'));
+      if (jobId)    jobs = jobs.filter(j => j.id === jobId);
+      if (hired === 'hired')  jobs = jobs.filter(j => getApplicationsByJob(j.id).some(a => a.status === 'aceite'));
+      if (hired === 'open')   jobs = jobs.filter(j => !getApplicationsByJob(j.id).some(a => a.status === 'aceite'));
+      if (hired === 'active') jobs = jobs.filter(j => j.status === 'active');
+
+      const apps = jobs.flatMap(j => getApplicationsByJob(j.id));
+
+      // Active filters label
+      const parts = [];
+      if (dateFrom || dateTo) parts.push(`${dateFrom || '…'} → ${dateTo || '…'}`);
+      if (jobId) { const jt = jobs[0]; if (jt) parts.push(jt.title); }
+      if (hired) parts.push(document.getElementById('rfHired').options[document.getElementById('rfHired').selectedIndex].text);
+      const activeDiv = document.getElementById('reportActiveFilters');
+      if (parts.length) {
+        activeDiv.style.display = 'block';
+        activeDiv.innerHTML = `A mostrar: <strong>${parts.join(' · ')}</strong> — ${jobs.length} vaga(s) · ${apps.length} candidatura(s) &nbsp;<span style="color:var(--blue);cursor:pointer" onclick="clearReportFilters()">✕ limpar filtros</span>`;
+      } else {
+        activeDiv.style.display = 'none';
+      }
+
+      renderReports(jobs, apps);
+    }
+
+    function clearReportFilters() {
+      ['rfYear','rfJob','rfHired'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('rfDateFrom').value = '';
+      document.getElementById('rfDateTo').value   = '';
+      document.getElementById('reportActiveFilters').style.display = 'none';
+      const all = getJobsByCompany(currentUser.id);
+      renderReports(all, all.flatMap(j => getApplicationsByJob(j.id)));
+    }
+
+    function renderReports(myJobs, allApps) {
+      const hiredJobs = myJobs.filter(j => getApplicationsByJob(j.id).some(a => a.status === 'aceite')).length;
+      const conversionRate = allApps.length ? ((allApps.filter(a => a.status === 'aceite').length / allApps.length) * 100).toFixed(0) : 0;
+      const hireRate = myJobs.length ? ((hiredJobs / myJobs.length) * 100).toFixed(0) : 0;
+
+      document.getElementById('reportStats').innerHTML = `
+        <div class="summary-card summary-card--blue">
+          <div class="summary-card__label">Vagas no Período</div>
+          <div class="summary-card__value">${myJobs.length}</div>
+          <div class="summary-card__sub">${myJobs.filter(j => j.status === 'active').length} activas</div>
+        </div>
+        <div class="summary-card summary-card--green">
+          <div class="summary-card__label">Contratações</div>
+          <div class="summary-card__value">${hiredJobs}</div>
+          <div class="summary-card__sub">${hireRate}% das vagas preenchidas</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card__label">Candidaturas</div>
+          <div class="summary-card__value">${allApps.length}</div>
+          <div class="summary-card__sub">recebidas no período</div>
+        </div>
+        <div class="summary-card summary-card--orange">
+          <div class="summary-card__label">Taxa de Conversão</div>
+          <div class="summary-card__value">${conversionRate}%</div>
+          <div class="summary-card__sub">candidaturas aceites</div>
+        </div>`;
+
+      // Chart: candidaturas por vaga
+      const maxApps = Math.max(...myJobs.map(j => getApplicationsByJob(j.id).length), 1);
+      const jobsBars = myJobs.length ? myJobs.map(j => {
+        const apps = getApplicationsByJob(j.id);
+        const c = apps.length;
+        const h = apps.filter(a => a.status === 'aceite').length;
+        const wasHired = h > 0;
+        return `<div class="chart-row">
+          <div class="chart-row__label" title="${j.title}">${j.title.length > 20 ? j.title.slice(0,18)+'…' : j.title}${wasHired ? ' <span style="color:#10b981;font-size:11px">✓ contratado</span>' : ''}</div>
+          <div class="chart-row__bar-wrap"><div class="chart-row__bar-fill" style="width:${(c/maxApps*100).toFixed(0)}%"></div></div>
+          <div class="chart-row__val">${c}</div>
+        </div>`;
+      }).join('') : '<div style="font-size:13px;color:var(--gray)">Sem vagas no período.</div>';
+
+      // Chart: status
+      const statuses = [
+        { key: 'pendente',   label: 'Pendente',   color: '#f59e0b' },
+        { key: 'em_analise', label: 'Em Análise', color: '#3b82f6' },
+        { key: 'aceite',     label: 'Aceite',     color: '#10b981' },
+        { key: 'rejeitado',  label: 'Rejeitado',  color: '#ef4444' },
+      ];
+      const maxStatus = Math.max(...statuses.map(s => allApps.filter(a => a.status === s.key).length), 1);
+      const statusBars = statuses.map(s => {
+        const c = allApps.filter(a => a.status === s.key).length;
+        return `<div class="chart-row">
+          <div class="chart-row__label">${s.label}</div>
+          <div class="chart-row__bar-wrap"><div class="chart-row__bar-fill" style="width:${(c/maxStatus*100).toFixed(0)}%;background:${s.color}"></div></div>
+          <div class="chart-row__val">${c}</div>
+        </div>`;
+      }).join('');
+
+      // Chart: vagas publicadas por mês (dentro do período filtrado)
+      const monthMap = {};
+      myJobs.forEach(j => {
+        if (!j.createdAt) return;
+        const d = new Date(j.createdAt);
+        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+        const label = d.toLocaleDateString('pt-PT', {month:'short', year:'numeric'});
+        if (!monthMap[key]) monthMap[key] = { label, count: 0, hired: 0 };
+        monthMap[key].count++;
+        if (getApplicationsByJob(j.id).some(a => a.status === 'aceite')) monthMap[key].hired++;
+      });
+      const monthEntries = Object.entries(monthMap).sort((a,b) => a[0].localeCompare(b[0]));
+      const maxMonth = Math.max(...monthEntries.map(([,v]) => v.count), 1);
+      const monthBars = monthEntries.length ? monthEntries.map(([,v]) => `<div class="chart-row">
+        <div class="chart-row__label">${v.label}</div>
+        <div class="chart-row__bar-wrap">
+          <div class="chart-row__bar-fill" style="width:${(v.count/maxMonth*100).toFixed(0)}%;background:#8b5cf6"></div>
+        </div>
+        <div class="chart-row__val">${v.count} <span style="color:#10b981;font-size:11px">(${v.hired} ✓)</span></div>
+      </div>`).join('') : '<div style="font-size:13px;color:var(--gray)">Sem dados.</div>';
+
+      // Chart: skills
+      const skillCount = {};
+      allApps.forEach(app => {
+        const cand = getUserById(app.colaboradorId);
+        if (cand && cand.skills) cand.skills.forEach(s => { skillCount[s] = (skillCount[s] || 0) + 1; });
+      });
+      const topSkills = Object.entries(skillCount).sort((a,b) => b[1]-a[1]).slice(0, 6);
+      const maxSkill  = topSkills[0] ? topSkills[0][1] : 1;
+      const skillBars = topSkills.length ? topSkills.map(([skill, c]) => `<div class="chart-row">
+        <div class="chart-row__label">${skill}</div>
+        <div class="chart-row__bar-wrap"><div class="chart-row__bar-fill" style="width:${(c/maxSkill*100).toFixed(0)}%;background:#10b981"></div></div>
+        <div class="chart-row__val">${c}</div>
+      </div>`).join('') : '<div style="font-size:13px;color:var(--gray)">Sem dados.</div>';
+
+      document.getElementById('reportCharts').innerHTML = `
+        <div class="report-card">
+          <div class="report-card__title">Candidaturas por Vaga</div>
+          ${jobsBars}
+        </div>
+        <div class="report-card">
+          <div class="report-card__title">Distribuição por Estado</div>
+          ${statusBars}
+        </div>
+        <div class="report-card">
+          <div class="report-card__title">Vagas Publicadas por Mês</div>
+          ${monthBars}
+        </div>
+        <div class="report-card">
+          <div class="report-card__title">Competências Mais Comuns</div>
+          ${skillBars}
+        </div>`;
+    }
+
+    function exportReportCSV() {
+      const dateFrom = document.getElementById('rfDateFrom').value;
+      const dateTo   = document.getElementById('rfDateTo').value;
+      const jobId    = document.getElementById('rfJob').value;
+      const hired    = document.getElementById('rfHired').value;
+      let jobs = getJobsByCompany(currentUser.id);
+      if (dateFrom) jobs = jobs.filter(j => j.createdAt && new Date(j.createdAt) >= new Date(dateFrom));
+      if (dateTo)   jobs = jobs.filter(j => j.createdAt && new Date(j.createdAt) <= new Date(dateTo + 'T23:59:59'));
+      if (jobId)    jobs = jobs.filter(j => j.id === jobId);
+      if (hired === 'hired')  jobs = jobs.filter(j => getApplicationsByJob(j.id).some(a => a.status === 'aceite'));
+      if (hired === 'open')   jobs = jobs.filter(j => !getApplicationsByJob(j.id).some(a => a.status === 'aceite'));
+      if (hired === 'active') jobs = jobs.filter(j => j.status === 'active');
+
+      const rows = [['Vaga','Data Publicação','Estado','Candidaturas','Aceites','Rejeitados','Contratação']];
+      jobs.forEach(j => {
+        const apps = getApplicationsByJob(j.id);
+        rows.push([
+          j.title,
+          j.createdAt ? new Date(j.createdAt).toLocaleDateString('pt-PT') : '—',
+          j.status === 'active' ? 'Activa' : 'Fechada',
+          apps.length,
+          apps.filter(a => a.status === 'aceite').length,
+          apps.filter(a => a.status === 'rejeitado').length,
+          apps.some(a => a.status === 'aceite') ? 'Sim' : 'Não'
+        ]);
+      });
+      const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url  = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `relatorio-recrutamento-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    /* =============================================
+       COMPANY PROFILE
+       ============================================= */
+    function loadCompanyProfile() {
+      const u = getUserById(currentUser.id) || currentUser;
+      document.getElementById('companyAvatarBig').textContent = u.avatar || '??';
+      document.getElementById('companyNameBig').textContent   = u.companyName || '—';
+      document.getElementById('companySectorBig').textContent = u.sector || '—';
+      const pubLink = `empresa-publica.html?id=${u.id}`;
+      document.getElementById('publicPageLink').href       = pubLink;
+      document.getElementById('viewPublicProfileBtn').href = pubLink;
+      document.getElementById('cpName').value     = u.companyName || '';
+      document.getElementById('cpSector').value   = u.sector      || '';
+      document.getElementById('cpLocation').value = u.location    || '';
+      document.getElementById('cpWebsite').value  = u.website     || '';
+      document.getElementById('cpSize').value     = u.size        || '';
+      document.getElementById('cpFounded').value  = u.founded     || '';
+      document.getElementById('cpAbout').value    = u.about       || '';
+      document.getElementById('cpCulture').value  = u.culture     || '';
+      document.getElementById('cpBenefits').value = u.benefits    || '';
+    }
+
+    function saveCompanyProfile(e) {
+      e.preventDefault();
+      const name = document.getElementById('cpName').value.trim();
+      const updates = {
+        companyName: name,
+        sector:   document.getElementById('cpSector').value,
+        location: document.getElementById('cpLocation').value.trim(),
+        website:  document.getElementById('cpWebsite').value.trim(),
+        size:     document.getElementById('cpSize').value,
+        founded:  document.getElementById('cpFounded').value,
+        about:    document.getElementById('cpAbout').value.trim(),
+        culture:  document.getElementById('cpCulture').value.trim(),
+        benefits: document.getElementById('cpBenefits').value.trim(),
+        avatar:   name.slice(0, 2).toUpperCase(),
+      };
+      currentUser = updateUserProfile(currentUser.id, updates);
+      document.getElementById('userAvatar').textContent  = currentUser.avatar;
+      document.getElementById('userName').textContent    = currentUser.companyName;
+      document.getElementById('dashWelcome').textContent = 'Bem-vindo, ' + currentUser.companyName;
+      loadCompanyProfile();
+      const alertEl = document.getElementById('companyProfileAlert');
+      alertEl.innerHTML = '<div class="alert alert--success">Perfil guardado com sucesso!</div>';
+      setTimeout(() => { alertEl.innerHTML = ''; }, 3000);
+    }
+
+    /* =============================================
+       CANDIDATE SEARCH
+       ============================================= */
+    function initCandidateSearch() {
+      document.getElementById('candidateResults').innerHTML = `<div style="font-size:13px;color:var(--gray);padding:20px 0">Use os filtros acima para pesquisar candidatos.</div>`;
+    }
+    function runCandidateSearch() {
+      const q      = document.getElementById('cndQ').value.trim();
+      const skRaw  = document.getElementById('cndSkills').value.trim();
+      const loc    = document.getElementById('cndLoc').value.trim();
+      const avail  = document.getElementById('cndAvail').value;
+      const skills = skRaw ? skRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+      const results = searchCandidates(q, skills, loc, avail || null);
+      const container = document.getElementById('candidateResults');
+      if (!results.length) {
+        container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><h3>Sem candidatos encontrados</h3><p>Ajuste os filtros de pesquisa.</p></div>`;
+        return;
+      }
+      const availLabels = { active: 'À procura activamente', open: 'Aberto a propostas', unavailable: 'Não disponível' };
+      const availCls    = { active: 'avail--active', open: 'avail--open', unavailable: 'avail--unavailable' };
+      container.innerHTML = results.map(c => {
+        const completed = getCompletedTestsForUser(c.id);
+        const tests     = getAvailableTests();
+        const passed    = completed.filter(t => { const def = tests.find(tt => tt.id === t.testId); return def && t.score >= def.passingScore; });
+        return `<div class="candidate-card">
+          <div class="avatar" style="width:52px;height:52px;font-size:17px;flex-shrink:0">${c.avatar || '?'}</div>
+          <div class="candidate-card__info">
+            <div class="candidate-card__name">${c.name} ${c.surname || ''}</div>
+            <div class="candidate-card__role">${c.role || 'Sem cargo definido'}</div>
+            <div class="candidate-card__meta">
+              ${c.location ? `<span>📍 ${c.location}</span>` : ''}
+              ${c.availability ? `<span class="avail-badge ${availCls[c.availability] || ''}">${availLabels[c.availability] || c.availability}</span>` : ''}
+              ${passed.length ? `<span style="font-size:12px;color:var(--green);font-weight:600">✓ ${passed.length} certificação${passed.length !== 1 ? 'ões' : ''}</span>` : ''}
+            </div>
+            ${c.skills && c.skills.length ? `<div class="candidate-card__skills">${c.skills.slice(0,5).map(s => `<span style="font-size:12px;padding:3px 10px;border-radius:20px;background:var(--blue-light);color:var(--blue);font-weight:500">${s}</span>`).join('')}</div>` : ''}
+            ${c.about ? `<div style="font-size:13px;color:var(--gray);margin-top:8px;line-height:1.5">${c.about.slice(0,120)}${c.about.length > 120 ? '…' : ''}</div>` : ''}
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0">
+            ${getCV(c.id) ? `<button class="btn btn--primary btn--sm" onclick="downloadCandidateCV('${c.id}')">Ver CV</button>` : '<span style="font-size:12px;color:var(--gray)">Sem CV</span>'}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    /* =============================================
+       KANBAN PIPELINE
+       ============================================= */
+    function populateKanbanFilter() {
+      const sel  = document.getElementById('kanbanJobFilter');
+      const jobs = getJobsByCompany(currentUser.id);
+      sel.innerHTML = '<option value="">Todas as vagas</option>' +
+        jobs.map(j => `<option value="${j.id}">${j.title}</option>`).join('');
+    }
+    function renderKanban() {
+      const jobFilter = document.getElementById('kanbanJobFilter').value;
+      const myJobs    = getJobsByCompany(currentUser.id);
+      let allApps     = myJobs.flatMap(j => getApplicationsByJob(j.id));
+      if (jobFilter) allApps = allApps.filter(a => a.jobId === jobFilter);
+
+      const cols = [
+        { key: 'pendente',    label: 'Pendente',    cls: 'kanban-col--pendente'   },
+        { key: 'em_analise',  label: 'Em Análise',  cls: 'kanban-col--analise'    },
+        { key: 'entrevista',  label: 'Entrevista',  cls: 'kanban-col--entrevista' },
+        { key: 'aceite',      label: 'Aceite',      cls: 'kanban-col--aceite'     },
+        { key: 'rejeitado',   label: 'Rejeitado',   cls: 'kanban-col--rejeitado'  },
+      ];
+
+      // Map interviews to "entrevista" column
+      const appsWithInterview = allApps.filter(a => getInterviewByApp(a.id) && a.status !== 'aceite' && a.status !== 'rejeitado').map(a => a.id);
+
+      const board = document.getElementById('kanbanBoard');
+      board.innerHTML = cols.map(col => {
+        let colApps;
+        if (col.key === 'entrevista') {
+          colApps = allApps.filter(a => appsWithInterview.includes(a.id));
+        } else if (col.key === 'pendente' || col.key === 'em_analise') {
+          colApps = allApps.filter(a => a.status === col.key && !appsWithInterview.includes(a.id));
+        } else {
+          colApps = allApps.filter(a => a.status === col.key);
+        }
+        return `<div class="kanban-col ${col.cls}">
+          <div class="kanban-col__header">
+            <span class="kanban-col__title">${col.label}</span>
+            <span class="kanban-col__count">${colApps.length}</span>
+          </div>
+          <div class="kanban-col__body">
+            ${colApps.length ? colApps.map(app => {
+              const cand = getUserById(app.colaboradorId);
+              const job  = getJobById(app.jobId);
+              if (!cand) return '';
+              return `<div class="kanban-card" onclick="openCandidateModal('${app.id}')">
+                <div class="kanban-card__name">${cand.name} ${cand.surname || ''}</div>
+                <div class="kanban-card__role">${cand.role || '—'}</div>
+                ${job ? `<div style="font-size:11px;color:var(--blue);margin-bottom:4px">${job.title}</div>` : ''}
+                <div class="kanban-card__date">${formatDate(app.appliedAt)}</div>
+              </div>`;
+            }).join('') : `<div style="font-size:12px;color:var(--gray-2);text-align:center;padding:16px">Sem candidatos</div>`}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    /* =============================================
+       EMPRESA EVENTOS
+       ============================================= */
+    function loadEmpresaEventos() {
+      const events = getEventsByCompany(currentUser.id);
+      const list   = document.getElementById('empresaEventosList');
+      if (!events.length) {
+        list.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><h3>Sem eventos criados</h3><p>Crie um evento para atrair candidatos.</p></div>`;
+        return;
+      }
+      list.innerHTML = events.map(ev => {
+        const d = new Date(ev.date);
+        return `<div class="event-card">
+          <div class="event-card__date-box">
+            <div class="event-card__day">${d.getDate().toString().padStart(2,'0')}</div>
+            <div class="event-card__month">${d.toLocaleDateString('pt-PT',{month:'short'})}</div>
+          </div>
+          <div class="event-card__info">
+            <div class="event-card__title">${ev.title}</div>
+            <div class="event-card__meta">
+              <span>🕐 ${ev.time}</span>
+              <span>📍 ${ev.location}</span>
+              <span>💻 ${ev.format}</span>
+              <span>👥 ${(ev.registrations||[]).length} inscritos</span>
+            </div>
+            <div class="event-card__desc">${ev.description}</div>
+          </div>
+          <div class="event-card__actions">
+            <button class="btn btn--ghost btn--sm" style="color:var(--red)" onclick="doDeleteEvent('${ev.id}')">Eliminar</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    function showCreateEvent()  { document.getElementById('createEventForm').style.display = 'block'; }
+    function hideCreateEvent()  { document.getElementById('createEventForm').style.display = 'none'; }
+    function submitCreateEvent() {
+      const title = document.getElementById('evTitle').value.trim();
+      const date  = document.getElementById('evDate').value;
+      const time  = document.getElementById('evTime').value;
+      if (!title || !date || !time) { showToast('Preencha título, data e hora.', 'error'); return; }
+      createEvent({
+        companyId:   currentUser.id,
+        title,
+        date,
+        time,
+        format:      document.getElementById('evFormat').value,
+        location:    document.getElementById('evLocation').value.trim(),
+        description: document.getElementById('evDesc').value.trim(),
+      });
+      hideCreateEvent();
+      showToast('Evento criado!', 'success');
+      loadEmpresaEventos();
+    }
+    function doDeleteEvent(evId) {
+      if (!confirm('Eliminar este evento?')) return;
+      deleteEvent(evId);
+      showToast('Evento eliminado.', 'info');
+      loadEmpresaEventos();
+    }
+
+    /* =============================================
+       TOAST
+       ============================================= */
+    function showToast(msg, type) {
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      t.className = `toast toast--${type || 'info'}`;
+      t.textContent = msg;
+      c.appendChild(t);
+      setTimeout(() => t.remove(), 3500);
+    }
+
+    /* =============================================
+       KEYBOARD
+       ============================================= */
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeProfileModal();
+    });
+
+    /* =============================================
+       INIT
+       ============================================= */
+    document.addEventListener('DOMContentLoaded', () => {
+      initDB();
+      initUI();
+    });
+  </script>
+</body>
+</html>
