@@ -339,10 +339,15 @@ function resetDB() {
 function getSession()       { try { return JSON.parse(sessionStorage.getItem(DB_KEYS.session)); } catch { return null; } }
 function setSession(user)   { sessionStorage.setItem(DB_KEYS.session, JSON.stringify(user)); }
 function clearSession()     { sessionStorage.removeItem(DB_KEYS.session); }
+
+// Calcula o caminho base para funcionar tanto em localhost como em GitHub Pages (/repo/)
+function basePath() { return window.location.pathname.replace(/[^/]*$/, ''); }
+function goTo(page) { window.location.href = basePath() + page; }
+
 function requireAuth(type)  {
   const user = getSession();
-  if (!user) { window.location.href = 'index.html'; return null; }
-  if (type && user.type !== type) { window.location.href = 'index.html'; return null; }
+  if (!user) { goTo('index.html'); return null; }
+  if (type && user.type !== type) { goTo('index.html'); return null; }
   return user;
 }
 
