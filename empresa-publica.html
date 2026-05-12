@@ -341,8 +341,8 @@
     function goToJob(jobId) {
       incrementJobClick(jobId);
       const isLogged = session && session.type === 'colaborador';
-      if (isLogged) { window.location.href = `colaborador.html?job=${jobId}`; }
-      else           { window.location.href = `index.html?job=${jobId}`; }
+      if (isLogged) { goTo(`colaborador.html?job=${jobId}`); }
+      else           { goTo(`index.html?job=${jobId}`); }
     }
 
     /* ---- AVALIAÇÕES ---- */

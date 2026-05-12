@@ -630,7 +630,7 @@ function starsHTML(rating, interactive, onClickFn) {
 function shareJob(jobId) {
   const job = getJobById(jobId);
   if (!job) return;
-  const url = `http://localhost:3000/empresa-publica.html?id=${job.companyId}`;
+  const url = window.location.origin + basePath() + `empresa-publica.html?id=${job.companyId}`;
   const text = `${job.title} @ ${job.companyName} — ${job.salary}`;
   if (navigator.share) { navigator.share({ title: text, url }); return; }
   navigator.clipboard.writeText(url).then(() => alert('Link copiado!'));
