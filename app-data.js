@@ -356,7 +356,16 @@ function requireAuth(type)  {
    ============================================= */
 function getUsers()          { try { return JSON.parse(localStorage.getItem(DB_KEYS.users)) || []; } catch { return []; } }
 function saveUsers(u)        { localStorage.setItem(DB_KEYS.users, JSON.stringify(u)); }
-function getUserById(id)     { return getUsers().find(u => u.id === id) || null; }
+function getUserById(id)        { return getUsers().find(u => u.id === id) || null; }
+function getUserByEmail(email)  { return getUsers().find(u => u.email === email) || null; }
+function resetPassword(email, newPassword) {
+  const users = getUsers();
+  const idx = users.findIndex(u => u.email === email);
+  if (idx === -1) return false;
+  users[idx].password = newPassword;
+  saveUsers(users);
+  return true;
+}
 function loginUser(email, pw){ return getUsers().find(u => u.email === email && u.password === pw) || null; }
 function registerUser(data) {
   const users = getUsers();
