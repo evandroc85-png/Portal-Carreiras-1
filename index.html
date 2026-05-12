@@ -62,7 +62,7 @@
           <div class="split-cta__icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </div>
-          <h2>Sou Colaborador</h2>
+          <h2>Sou Candidato</h2>
           <p>Crie o seu perfil, candidate-se a vagas e acompanhe o estado das suas candidaturas em tempo real.</p>
           <ul class="split-cta__list">
             <li>Perfil profissional gratuito</li>
@@ -150,7 +150,7 @@
       </div>
       <div class="footer__links">
         <div>
-          <h4>Colaboradores</h4>
+          <h4>Candidatos</h4>
           <a href="#" onclick="openModal('colaborador','login')">Pesquisar Vagas</a>
           <a href="#" onclick="openModal('colaborador','register')">Criar Perfil</a>
         </div>
@@ -181,7 +181,7 @@
       <div class="modal__header">
         <div class="modal__type-tabs">
           <button class="modal__type-tab active" id="tabColaborador" onclick="switchType('colaborador')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Colaborador
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Candidato
           </button>
           <button class="modal__type-tab" id="tabEmpresa" onclick="switchType('empresa')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>Empresa
@@ -196,7 +196,7 @@
       <!-- Login Form -->
       <form class="modal__form" id="loginForm" onsubmit="handleLogin(event)">
         <h3 id="loginTitle">Bem-vindo de volta</h3>
-        <p class="modal__form-sub" id="loginSub">Entre na sua conta de colaborador</p>
+        <p class="modal__form-sub" id="loginSub">Entre na sua conta de candidato</p>
         <div id="loginAlert"></div>
         <div class="demo-box" id="demoBox">
           <strong>Contas de demonstração</strong>
@@ -215,7 +215,7 @@
       <!-- Register Form -->
       <form class="modal__form hidden" id="registerForm" onsubmit="handleRegister(event)" novalidate>
         <h3 id="registerTitle">Criar Conta</h3>
-        <p class="modal__form-sub" id="registerSub">Registe-se como colaborador</p>
+        <p class="modal__form-sub" id="registerSub">Registe-se como candidato</p>
         <div id="registerAlert"></div>
         <div id="colabFields">
           <div class="form-group form-group--half">
@@ -278,9 +278,9 @@
       document.getElementById('registerAlert').innerHTML = '';
       const isEmpresa = currentType === 'empresa';
       document.getElementById('loginTitle').textContent    = isEmpresa ? 'Acesso Empresa' : 'Bem-vindo de volta';
-      document.getElementById('loginSub').textContent      = isEmpresa ? 'Entre na conta da sua empresa' : 'Entre na sua conta de colaborador';
+      document.getElementById('loginSub').textContent      = isEmpresa ? 'Entre na conta da sua empresa' : 'Entre na sua conta de candidato';
       document.getElementById('registerTitle').textContent = isEmpresa ? 'Registar Empresa' : 'Criar Conta';
-      document.getElementById('registerSub').textContent   = isEmpresa ? 'Publique vagas e encontre talento' : 'Registe-se como colaborador';
+      document.getElementById('registerSub').textContent   = isEmpresa ? 'Publique vagas e encontre talento' : 'Registe-se como candidato';
       // Demo credentials
       document.getElementById('demoCredentials').innerHTML = isEmpresa
         ? '<br>📧 <code>rh@novatech.pt</code> &nbsp; 🔑 <code>demo123</code><br>📧 <code>rh@creativehub.pt</code> &nbsp; 🔑 <code>demo123</code>'
@@ -299,7 +299,7 @@
         return;
       }
       if (user.type !== currentType) {
-        document.getElementById('loginAlert').innerHTML = `<div class="alert alert--error">Esta conta é do tipo "${user.type === 'empresa' ? 'Empresa' : 'Colaborador'}". Seleccione o tipo correcto.</div>`;
+        document.getElementById('loginAlert').innerHTML = `<div class="alert alert--error">Esta conta é do tipo "${user.type === 'empresa' ? 'Empresa' : 'Candidato'}". Seleccione o tipo correcto.</div>`;
         return;
       }
       setSession(user);
