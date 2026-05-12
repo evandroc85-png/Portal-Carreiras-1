@@ -251,7 +251,7 @@
     // Redirect if already logged in
     const _sess = getSession();
     if (_sess) {
-      window.location.href = _sess.type === 'empresa' ? '/empresa.html' : '/colaborador.html';
+      window.location.href = _sess.type === 'empresa' ? 'empresa.html' : 'colaborador.html';
     }
 
     function openModal(type, action) {
@@ -303,7 +303,7 @@
         return;
       }
       setSession(user);
-      window.location.href = user.type === 'empresa' ? '/empresa.html' : '/colaborador.html';
+      window.location.href = user.type === 'empresa' ? 'empresa.html' : 'colaborador.html';
     }
 
     function handleRegister(e) {
@@ -320,7 +320,7 @@
         return;
       }
       setSession(result.user);
-      window.location.href = result.user.type === 'empresa' ? '/empresa.html' : '/colaborador.html';
+      window.location.href = result.user.type === 'empresa' ? 'empresa.html' : 'colaborador.html';
     }
 
     function handleSearch(e) {

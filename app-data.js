@@ -341,8 +341,8 @@ function setSession(user)   { sessionStorage.setItem(DB_KEYS.session, JSON.strin
 function clearSession()     { sessionStorage.removeItem(DB_KEYS.session); }
 function requireAuth(type)  {
   const user = getSession();
-  if (!user) { window.location.href = '/'; return null; }
-  if (type && user.type !== type) { window.location.href = '/'; return null; }
+  if (!user) { window.location.href = 'index.html'; return null; }
+  if (type && user.type !== type) { window.location.href = 'index.html'; return null; }
   return user;
 }
 
