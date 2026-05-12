@@ -25,6 +25,10 @@ while ($listener.IsListening) {
         }
         $res.ContentType = $mime
         $res.ContentLength64 = $bytes.Length
+        $res.Headers.Add("X-Content-Type-Options", "nosniff")
+        $res.Headers.Add("X-Frame-Options", "DENY")
+        $res.Headers.Add("X-XSS-Protection", "1; mode=block")
+        $res.Headers.Add("Referrer-Policy", "strict-origin-when-cross-origin")
         $res.OutputStream.Write($bytes, 0, $bytes.Length)
     } else {
         $res.StatusCode = 404

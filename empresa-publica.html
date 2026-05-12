@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
   <title>Portal Carreiras — Empresa</title>
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -234,7 +237,7 @@
         company.founded  ? `📅 Fundada em ${company.founded}` : null,
         company.website  ? `🌐 <a href="https://${company.website}" target="_blank" style="color:var(--blue)">${company.website}</a>` : null,
       ].filter(Boolean);
-      document.getElementById('pubMeta').innerHTML = metaParts.map(p => `<span>${p}</span>`).join('');
+      document.getElementById('pubMeta').innerHTML = metaParts.map(p => `<span>${sanitize(p)}</span>`).join('');
 
       // Rating badge
       const avgR = getAverageRating(companyId);
@@ -252,7 +255,7 @@
         ['Fundada',   company.founded],
         ['Website',   company.website ? `<a href="https://${company.website}" target="_blank">${company.website}</a>` : null],
       ].filter(r => r[1]);
-      document.getElementById('sideInfo').innerHTML = infoRows.map(([l,v]) => `<div class="side-stat"><span class="side-stat__label">${l}</span><span class="side-stat__val">${v}</span></div>`).join('');
+      document.getElementById('sideInfo').innerHTML = infoRows.map(([l,v]) => `<div class="side-stat"><span class="side-stat__label">${sanitize(l)}</span><span class="side-stat__val">${sanitize(v)}</span></div>`).join('');
 
       // Sidebar stats
       const myJobs = getJobsByCompany(companyId);
@@ -303,7 +306,7 @@
         cultureSec.style.display = 'block';
       } else { cultureSec.style.display = 'none'; }
       if (company.benefits) {
-        document.getElementById('pubBenefits').innerHTML = company.benefits.split('·').map(b => b.trim()).filter(Boolean).map(b => `<div class="benefit-tag">${b}</div>`).join('');
+        document.getElementById('pubBenefits').innerHTML = company.benefits.split('·').map(b => b.trim()).filter(Boolean).map(b => `<div class="benefit-tag">${sanitize(b)}</div>`).join('');
         benefitsSec.style.display = 'block';
       } else { benefitsSec.style.display = 'none'; }
     }

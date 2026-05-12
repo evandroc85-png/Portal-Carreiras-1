@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
   <title>Portal Carreiras — Área da Empresa</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -1011,7 +1014,7 @@
             </div>
           </div>
 
-          ${cand.about ? `<div class="profile-view__section"><h3>Sobre</h3><p style="font-size:14px;color:var(--dark-2);line-height:1.75">${cand.about}</p></div>` : ''}
+          ${cand.about ? `<div class="profile-view__section"><h3>Sobre</h3><p style="font-size:14px;color:var(--dark-2);line-height:1.75">${sanitize(cand.about)}</p></div>` : ''}
 
           ${cand.skills && cand.skills.length ? `<div class="profile-view__section">
             <h3>Competências</h3>
@@ -1069,7 +1072,7 @@
               <div class="interview-info__item"><div class="interview-info__label">Formato</div><div class="interview-info__val">${interview.format}</div></div>
               <div class="interview-info__item"><div class="interview-info__label">Local / Link</div><div class="interview-info__val">${interview.location || '—'}</div></div>
             </div>
-            ${interview.note ? `<div style="margin-top:10px;font-size:13px;color:var(--dark-2)">${interview.note}</div>` : ''}
+            ${interview.note ? `<div style="margin-top:10px;font-size:13px;color:var(--dark-2)">${sanitize(interview.note)}</div>` : ''}
           </div>
           <div style="font-size:13px;font-weight:600;color:var(--dark);margin-bottom:12px">Actualizar entrevista</div>` : `<div style="font-size:13px;font-weight:600;color:var(--dark);margin-bottom:14px">Agendar entrevista</div>`}
 
@@ -1430,7 +1433,7 @@
       container.innerHTML = msgs.map(m => {
         const isOut = m.senderType === 'empresa';
         return `<div class="chat-bubble ${isOut ? 'chat-bubble--out' : 'chat-bubble--in'}">
-          ${m.content}
+          ${sanitize(m.content)}
           <div style="font-size:10px;opacity:.6;margin-top:3px;text-align:right">${formatDateTime(m.date)}</div>
         </div>`;
       }).join('');

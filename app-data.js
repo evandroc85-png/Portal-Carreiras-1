@@ -336,9 +336,25 @@ function resetDB() {
 /* =============================================
    SESSION
    ============================================= */
-function getSession()       { try { return JSON.parse(sessionStorage.getItem(DB_KEYS.session)); } catch { return null; } }
-function setSession(user)   { sessionStorage.setItem(DB_KEYS.session, JSON.stringify(user)); }
-function clearSession()     { sessionStorage.removeItem(DB_KEYS.session); }
+/* --- SECURITY HELPERS --- */
+function sanitize(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;');
+}
+
+function getSession()     { try { return JSON.parse(sessionStorage.getItem(DB_KEYS.session)); } catch { return null; } }
+function setSession(user) {
+  // Never store the password in the session
+  const { password, ...safeUser } = user;
+  sessionStorage.setItem(DB_KEYS.session, JSON.stringify(safeUser));
+}
+function clearSession()   { sessionStorage.removeItem(DB_KEYS.session); }
 
 // Calcula o caminho base para funcionar tanto em localhost como em GitHub Pages (/repo/)
 function basePath() { return window.location.pathname.replace(/[^/]*$/, ''); }
