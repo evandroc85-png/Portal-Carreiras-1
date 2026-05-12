@@ -213,14 +213,14 @@
       </form>
 
       <!-- Register Form -->
-      <form class="modal__form hidden" id="registerForm" onsubmit="handleRegister(event)">
+      <form class="modal__form hidden" id="registerForm" onsubmit="handleRegister(event)" novalidate>
         <h3 id="registerTitle">Criar Conta</h3>
         <p class="modal__form-sub" id="registerSub">Registe-se como colaborador</p>
         <div id="registerAlert"></div>
         <div id="colabFields">
           <div class="form-group form-group--half">
-            <div><label>Nome</label><input type="text" id="regName" placeholder="Nome" required /></div>
-            <div><label>Apelido</label><input type="text" id="regSurname" placeholder="Apelido" required /></div>
+            <div><label>Nome</label><input type="text" id="regName" placeholder="Nome" /></div>
+            <div><label>Apelido</label><input type="text" id="regSurname" placeholder="Apelido" /></div>
           </div>
           <div class="form-group"><label>Cargo / Área</label><input type="text" id="regRole" placeholder="ex: Engenheiro de Software" /></div>
         </div>
@@ -309,14 +309,31 @@
     function handleRegister(e) {
       e.preventDefault();
       const isEmpresa = currentType === 'empresa';
-      const email = document.getElementById('regEmail').value.trim();
+      const email    = document.getElementById('regEmail').value.trim();
       const password = document.getElementById('regPassword').value;
+      const terms    = document.getElementById('regTerms').checked;
+      const alertEl  = document.getElementById('registerAlert');
+
+      // Validação manual
+      if (isEmpresa) {
+        const companyName = document.getElementById('regCompanyName').value.trim();
+        if (!companyName) { alertEl.innerHTML = '<div class="alert alert--error">Indique o nome da empresa.</div>'; return; }
+      } else {
+        const name    = document.getElementById('regName').value.trim();
+        const surname = document.getElementById('regSurname').value.trim();
+        if (!name || !surname) { alertEl.innerHTML = '<div class="alert alert--error">Indique o nome e apelido.</div>'; return; }
+      }
+      if (!email)              { alertEl.innerHTML = '<div class="alert alert--error">Indique o seu email.</div>'; return; }
+      if (password.length < 8) { alertEl.innerHTML = '<div class="alert alert--error">A password deve ter pelo menos 8 caracteres.</div>'; return; }
+      if (!terms)              { alertEl.innerHTML = '<div class="alert alert--error">Deve aceitar os Termos de Uso para continuar.</div>'; return; }
+
       const data = isEmpresa
         ? { type: 'empresa', email, password, companyName: document.getElementById('regCompanyName').value.trim(), sector: document.getElementById('regSector').value, avatar: document.getElementById('regCompanyName').value.trim().slice(0,2).toUpperCase() || 'EM' }
         : { type: 'colaborador', email, password, name: document.getElementById('regName').value.trim(), surname: document.getElementById('regSurname').value.trim(), role: document.getElementById('regRole').value.trim(), skills: [], experience: [], education: [], avatar: (document.getElementById('regName').value[0] || '') + (document.getElementById('regSurname').value[0] || '') };
+
       const result = registerUser(data);
       if (result.error) {
-        document.getElementById('registerAlert').innerHTML = `<div class="alert alert--error">${result.error}</div>`;
+        alertEl.innerHTML = `<div class="alert alert--error">${result.error}</div>`;
         return;
       }
       setSession(result.user);
